@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delicious Restaurant - Order Now!</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <h1>🍕 Delicious</h1>
+            </div>
+            <div class="nav-links">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#menu" class="nav-link">Menu</a>
+                <a href="#contact" class="nav-link">Contact</a>
+                <button id="adminBtn" class="btn-admin hidden">Admin Dashboard</button>
+                <button id="loginBtn" class="btn-login">Admin Login</button>
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to Delicious Restaurant</h1>
+            <p class="hero-subtitle">Experience the finest flavors in town</p>
+            <a href="#menu" class="btn btn-primary">View Menu</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-card">
+                    <h3>🕐 Opening Hours</h3>
+                    <p>Monday - Friday: 11:00 AM - 10:00 PM</p>
+                    <p>Saturday - Sunday: 12:00 PM - 11:00 PM</p>
+                </div>
+                <div class="about-card call-to-order">
+                    <h3>📞 Call to Order</h3>
+                    <p class="phone-number">(555) 123-4567</p>
+                    <p>Call us directly to place your order!</p>
+                </div>
+                <div class="about-card">
+                    <h3>📍 Location</h3>
+                    <p>123 Food Street</p>
+                    <p>Flavor Town, FT 12345</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="menu">
+        <div class="container">
+            <h2 class="section-title">Our Menu</h2>
+
+            <!-- Search and Filter -->
+            <div class="menu-controls">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search menu items...">
+
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-category="all">All</button>
+                    <button class="filter-btn" data-category="pizzas">Pizzas</button>
+                    <button class="filter-btn" data-category="tacos">Tacos</button>
+                    <button class="filter-btn" data-category="drinks">Drinks</button>
+                    <button class="filter-btn" data-category="familypack">Family Pack</button>
+                </div>
+            </div>
+
+            <!-- Menu Items Grid -->
+            <div id="menuGrid" class="menu-grid">
+                <!-- Items will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Contact Us</h2>
+            <div class="contact-info">
+                <p>📧 Email: info@delicious-restaurant.com</p>
+                <p>📞 Phone: (555) 123-4567</p>
+                <p>📍 Address: 123 Food Street, Flavor Town, FT 12345</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Delicious Restaurant. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Admin Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close-admin">&times;</span>
+            <h2>Admin Dashboard</h2>
+
+            <div class="admin-tabs">
+                <button class="tab-btn active" data-tab="add">Add Item</button>
+                <button class="tab-btn" data-tab="manage">Manage Items</button>
+            </div>
+
+            <!-- Add Item Tab -->
+            <div id="addTab" class="tab-content active">
+                <form id="addItemForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="itemName">Item Name *</label>
+                        <input type="text" id="itemName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemPrice">Price ($) *</label>
+                        <input type="number" id="itemPrice" name="price" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemCategory">Category *</label>
+                        <select id="itemCategory" name="category" required>
+                            <option value="">Select category</option>
+                            <option value="pizzas">Pizzas</option>
+                            <option value="tacos">Tacos</option>
+                            <option value="drinks">Drinks</option>
+                            <option value="familypack">Family Pack</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemImage">Image *</label>
+                        <input type="file" id="itemImage" name="image" accept="image/*" required>
+                        <div id="imagePreview" class="image-preview"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Item</button>
+                </form>
+            </div>
+
+            <!-- Manage Items Tab -->
+            <div id="manageTab" class="tab-content">
+                <div id="adminItemsList" class="admin-items-list">
+                    <!-- Items will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

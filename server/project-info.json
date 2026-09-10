@@ -1,0 +1,71 @@
+{
+  "app": {
+    "name": "Delicious Restaurant",
+    "version": "1.0.0",
+    "description": "Full-stack restaurant web application"
+  },
+  "admin": {
+    "username": "admin",
+    "password": "admin123",
+    "note": "Change these credentials in server.js before production deployment!"
+  },
+  "features": {
+    "customer": [
+      "Browse menu with categories",
+      "Search items by name",
+      "Filter by category (pizzas, tacos, drinks, familypack)",
+      "Dark/Light theme toggle",
+      "View item availability",
+      "Restaurant contact info and hours"
+    ],
+    "admin": [
+      "Secure login",
+      "Add menu items with image upload",
+      "Delete menu items",
+      "Toggle item availability",
+      "Real-time updates"
+    ]
+  },
+  "database": {
+    "name": "restaurant_db",
+    "table": "items",
+    "fields": {
+      "id": "INT AUTO_INCREMENT PRIMARY KEY",
+      "name": "VARCHAR(255)",
+      "price": "DECIMAL(10,2)",
+      "category": "ENUM('pizzas','tacos','drinks','familypack')",
+      "image_url": "VARCHAR(500)",
+      "is_available": "TINYINT(1)",
+      "created_at": "TIMESTAMP",
+      "updated_at": "TIMESTAMP"
+    }
+  },
+  "setup_steps": [
+    "1. Install MySQL and create database using database.sql",
+    "2. Copy .env.example to .env and configure credentials",
+    "3. Add sample images to public/images/ and public/uploads/",
+    "4. Run: npm install",
+    "5. Run: npm start",
+    "6. Visit: http://localhost:3000"
+  ],
+  "required_images": {
+    "hero_background": "public/images/frontpic.png (1920x1080px recommended)",
+    "sample_items": [
+      "public/uploads/pizza1.jpg",
+      "public/uploads/taco1.jpg",
+      "public/uploads/drink1.jpg"
+    ]
+  },
+  "tech_stack": {
+    "frontend": "Vanilla HTML5, CSS3, JavaScript ES6+",
+    "backend": "Node.js with Express",
+    "database": "MySQL",
+    "file_upload": "Multer",
+    "styling": "Custom CSS with CSS Variables for theming"
+  },
+  "theme": {
+    "primary_color": "#dc2626 (Red)",
+    "supports": "Dark and Light modes with toggle",
+    "persistence": "localStorage"
+  }
+}
