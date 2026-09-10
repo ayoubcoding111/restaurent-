@@ -20,20 +20,22 @@
   --modal-overlay: rgba(0, 0, 0, 0.5);
 }
 
+/* Dark theme — applied when the theme switch sets data-theme="dark" on <html> */
 [data-theme="dark"] {
-  --bg-color: #111827;
-  --bg-secondary: #1f2937;
+  --bg-color: #1f2937;
+  --bg-secondary: #111827;
   --text-color: #f9fafb;
   --text-secondary: #9ca3af;
   --border-color: #374151;
 
-  --card-bg: #1f2937;
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --card-bg: #111827;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   --card-shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.5);
 
   --nav-bg: rgba(17, 24, 39, 0.95);
   --modal-overlay: rgba(0, 0, 0, 0.7);
 }
+
 
 /* ============================================
    Reset & Base Styles
@@ -106,27 +108,6 @@ body {
   color: var(--primary-color);
 }
 
-.theme-toggle {
-  background: var(--bg-secondary);
-  border: 2px solid var(--border-color);
-  border-radius: 50%;
-  width: 45px;
-  height: 45px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.theme-toggle:hover {
-  transform: scale(1.1);
-  border-color: var(--primary-color);
-}
-
-.theme-icon {
-  font-size: 1.5rem;
-}
 
 /* ============================================
    Buttons
@@ -412,20 +393,12 @@ body {
   color: #15803d;
 }
 
-[data-theme="dark"] .available {
-  background: #14532d;
-  color: #86efac;
-}
 
 .unavailable {
   background: #fee2e2;
   color: #991b1b;
 }
 
-[data-theme="dark"] .unavailable {
-  background: #7f1d1d;
-  color: #fca5a5;
-}
 
 /* ============================================
    Contact & Footer
@@ -659,6 +632,301 @@ body {
 }
 
 /* ============================================
+   Cart Badge
+   ============================================ */
+.cart-link {
+  position: relative;
+}
+
+.cart-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -8px;
+  right: -14px;
+  background: var(--primary-color);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+/* ============================================
+   Menu Item Action Buttons
+   ============================================ */
+.menu-item-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn-add-cart {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-add-cart:hover:not(:disabled) {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-add-cart:disabled,
+.btn-order-now:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-order-now {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  background: var(--primary-color);
+  color: white;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-order-now:hover:not(:disabled) {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   Page Sections (shared)
+   ============================================ */
+.page-section {
+  margin-top: 90px;
+  padding: 3rem 0 4rem;
+  min-height: 60vh;
+}
+
+.page-section.hidden {
+  display: none;
+}
+
+.hero.hidden,
+.about.hidden,
+.menu.hidden,
+.contact.hidden {
+  display: none;
+}
+
+/* ============================================
+   Cart Page
+   ============================================ */
+.cart-items-list {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.cart-empty {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  padding: 3rem 0;
+}
+
+.cart-empty a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.cart-empty a:hover {
+  text-decoration: underline;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 1.25rem;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+}
+
+.cart-item-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.cart-item-info h4 {
+  color: var(--text-color);
+  margin-bottom: 0.25rem;
+}
+
+.cart-item-price {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.cart-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.qty-btn {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-color);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s;
+}
+
+.qty-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.qty-value {
+  font-weight: 700;
+  font-size: 1rem;
+  min-width: 24px;
+  text-align: center;
+  color: var(--text-color);
+}
+
+.cart-item-subtotal {
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 1rem;
+  min-width: 70px;
+  text-align: right;
+}
+
+.btn-remove {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.btn-remove:hover {
+  color: #ef4444;
+}
+
+.cart-footer {
+  border-top: 2px solid var(--border-color);
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.cart-total {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 2px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* ============================================
+   Checkout Modal
+   ============================================ */
+.checkout-subtitle {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+#checkoutSubmitBtn {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.close-checkout {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close-checkout:hover {
+  color: var(--primary-color);
+}
+
+/* ============================================
+   Thank You Page
+   ============================================ */
+.thank-you-card {
+  text-align: center;
+  max-width: 500px;
+  margin: 4rem auto;
+  padding: 3rem 2rem;
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+}
+
+.thank-you-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.thank-you-text {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  line-height: 1.7;
+}
+
+/* ============================================
    Utility Classes
    ============================================ */
 .hidden {
@@ -707,6 +975,20 @@ body {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
   }
+
+  .cart-item {
+    grid-template-columns: 60px 1fr;
+    gap: 0.8rem;
+  }
+
+  .cart-item-controls {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+  }
+
+  .menu-item-actions {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 480px) {
@@ -729,4 +1011,55 @@ body {
   .phone-number {
     font-size: 1.5rem;
   }
+}
+/* The switch - the box around the slider */
+.switch {
+  font-size: 17px;
+  position: relative;
+  display: inline-block;
+  width: 3.5em;
+  height: 2em;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  --background: #28096b;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--background);
+  transition: 0.5s;
+  border-radius: 30px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 1.4em;
+  width: 1.4em;
+  border-radius: 50%;
+  left: 10%;
+  bottom: 15%;
+  box-shadow: inset 8px -4px 0px 0px #fff000;
+  background: var(--background);
+  transition: 0.5s;
+}
+
+input:checked + .slider {
+  background-color: #522ba7;
+}
+
+input:checked + .slider:before {
+  transform: translateX(100%);
+  box-shadow: inset 15px -4px 0px 15px #fff000;
 }
