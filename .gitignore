@@ -8,13 +8,22 @@ node_modules/
 server/uploads/*
 !server/uploads/.gitkeep
 
+# IDE / editor files
+.vscode/
+.idea/
+*.code-workspace
+
+# Claude Code
+.claude/
+server/.claude/
+
 # OS files
 .DS_Store
 Thumbs.db
 
-# IDE files
-.vscode/
-.idea/
+# Temp / session files
+*.session.sql
 
 # Logs
 *.log
+npm-debug.log*

@@ -1,9 +1,9 @@
-SHOW Databases;
-USE restaurant_db;
-show tables;
-describe items;
-select * FROM items;
-UPDATE items 
-SET name = '3 fromage' 
-WHERE id = '1';
-
+SHOW DATABASES;
+use restaurant_db;
+SHOW TABLEs;
+DESCRIBE items;
+DESCRIBE orders;
+DESCRIBE staff;
+SELECT * FROM items;
+SELECT * FROM orders;
+SELECT * FROM staff;

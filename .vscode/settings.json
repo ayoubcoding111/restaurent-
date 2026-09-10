@@ -14,8 +14,7 @@
       "database": "ayoub",
       "username": "root",
       "password": "Sara4216",
-      "connectionTimeout": 40
+      "connectionTimeout": 60
     }
-  ],
-  "liveServer.settings.port": 5501
+  ]
 }
