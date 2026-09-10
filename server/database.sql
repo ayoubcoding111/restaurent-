@@ -16,8 +16,10 @@ CREATE TABLE items (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Insert sample data (3 initial items)
+-- Insert sample data (5 initial items)
 INSERT INTO items (name, price, category, image_url, is_available) VALUES
 ('Margherita Pizza', 12.99, 'pizzas', '/uploads/pizza1.jpg', 1),
 ('Beef Tacos', 8.99, 'tacos', '/uploads/taco1.jpg', 1),
-('Fresh Lemonade', 3.99, 'drinks', '/uploads/drink1.jpg', 1);
+('Sprite', 2.99, 'drinks', '/uploads/sprite.jpg', 1),
+('Coca-Cola', 2.99, 'drinks', '/uploads/coca.jpg', 1),
+('Family Pack', 24.99, 'familypack', '/uploads/familypack.jpg', 1);
