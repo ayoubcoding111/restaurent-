@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS items (
     name VARCHAR(255) NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
     category ENUM('pizzas', 'tacos', 'drinks', 'familypack') NOT NULL,
+    description TEXT DEFAULT NULL,
     image_url VARCHAR(500) NOT NULL,
     is_available TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -23,12 +24,12 @@ CREATE TABLE IF NOT EXISTS items (
 );
 
 -- Sample menu items
-INSERT INTO items (name, price, category, image_url, is_available) VALUES
-('Margherita Pizza', 12.99, 'pizzas', '/uploads/pizza1.jpg', 1),
-('Beef Tacos', 8.99, 'tacos', '/uploads/taco1.jpg', 1),
-('Sprite', 2.99, 'drinks', '/uploads/sprite.jpg', 1),
-('Coca-Cola', 2.99, 'drinks', '/uploads/coca.jpg', 1),
-('Family Pack', 24.99, 'familypack', '/uploads/familypack.jpg', 1);
+INSERT INTO items (name, price, category, description, image_url, is_available) VALUES
+('Margherita Pizza', 12.99, 'pizzas', 'Classic Italian pizza with fresh mozzarella, tomatoes, and basil.', '/uploads/pizza1.jpg', 1),
+('Beef Tacos', 8.99, 'tacos', 'Crispy corn tortillas filled with seasoned beef, lettuce, and salsa.', '/uploads/taco1.jpg', 1),
+('Sprite', 2.99, 'drinks', 'Refreshing lemon-lime soda, served ice cold.', '/uploads/sprite.jpg', 1),
+('Coca-Cola', 2.99, 'drinks', 'The classic cola taste you love, perfectly chilled.', '/uploads/coca.jpg', 1),
+('Family Pack', 24.99, 'familypack', 'Feeds 4-6 people: 2 large pizzas, wings, and sides.', '/uploads/familypack.jpg', 1);
 
 -- ============================================
 -- Staff accounts table (admin + staff users)
@@ -63,3 +64,9 @@ CREATE TABLE IF NOT EXISTS orders (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- ============================================
+-- Migration: Add description column to items
+-- Safe to run on existing databases
+-- ============================================
+-- ALTER TABLE items ADD COLUMN description TEXT DEFAULT NULL AFTER category;

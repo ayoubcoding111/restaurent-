@@ -239,7 +239,7 @@ app.get('/api/items/:id', async (req, res) => {
 
 app.post('/api/items', requireAdmin, upload.single('image'), async (req, res) => {
     try {
-        const { name, price, category } = req.body;
+        const { name, price, category, description } = req.body;
         if (!name || !price || !category) {
             return res.status(400).json({ success: false, message: 'Missing required fields' });
         }
@@ -247,11 +247,12 @@ app.post('/api/items', requireAdmin, upload.single('image'), async (req, res) =>
             return res.status(400).json({ success: false, message: 'Image is required' });
         }
         const image_url = '/uploads/' + req.file.filename;
+        const desc = description || null;
         const [result] = await db.query(
-            'INSERT INTO items (name, price, category, image_url) VALUES (?, ?, ?, ?)',
-            [name, parseFloat(price), category, image_url]
+            'INSERT INTO items (name, price, category, description, image_url) VALUES (?, ?, ?, ?, ?)',
+            [name, parseFloat(price), category, desc, image_url]
         );
-        res.json({ success: true, message: 'Item added', data: { id: result.insertId, name, price, category, image_url } });
+        res.json({ success: true, message: 'Item added', data: { id: result.insertId, name, price, category, description: desc, image_url } });
     } catch (error) {
         console.error('Error adding item:', error);
         res.status(500).json({ success: false, message: 'Failed to add item' });
@@ -294,6 +295,22 @@ app.get('*', (req, res) => {
 // ============================================
 // Admin Bootstrap & Start
 // ============================================
+// ============================================
+// Migration: add description column if missing
+// ============================================
+async function migrateDB() {
+    try {
+        const [cols] = await db.query("SHOW COLUMNS FROM items LIKE 'description'");
+        if (cols.length === 0) {
+            await db.query('ALTER TABLE items ADD COLUMN description TEXT DEFAULT NULL AFTER category');
+            console.log('✅ Added description column to items table');
+        }
+    } catch (error) {
+        // Non-fatal — table might not exist yet on fresh DB
+        console.warn('⚠️  Migration note:', error.message);
+    }
+}
+
 async function bootstrapAdmin() {
     try {
         const [rows] = await db.query("SELECT id FROM staff WHERE role = 'admin' LIMIT 1");
@@ -311,6 +328,7 @@ async function bootstrapAdmin() {
 }
 
 async function start() {
+    await migrateDB();
     await bootstrapAdmin();
     app.listen(PORT, () => {
         console.log(`🚀 Server running on http://localhost:${PORT}`);

@@ -5,7 +5,10 @@ const AppState = {
     currentCategory: 'all',
     searchQuery: '',
     allItems: [],
-    currentView: 'home'
+    filteredItems: [],
+    currentView: 'home',
+    itemsPerPage: 6,
+    displayedCount: 0
 };
 
 // ============================================
@@ -131,6 +134,7 @@ const MenuDisplay = {
         await this.loadItems();
         this.setupSearch();
         this.setupFilters();
+        this.setupLoadMore();
     },
 
     async loadItems() {
@@ -138,7 +142,7 @@ const MenuDisplay = {
             const result = await API.getItems();
             if (result.success) {
                 AppState.allItems = result.data;
-                this.renderItems(result.data);
+                this.resetAndRender();
             }
         } catch (error) {
             console.error('Error loading items:', error);
@@ -147,13 +151,54 @@ const MenuDisplay = {
         }
     },
 
-    renderItems(items) {
+    resetAndRender() {
+        AppState.filteredItems = this.getFilteredItems();
+        AppState.displayedCount = 0;
+        document.getElementById('menuGrid').innerHTML = '';
+        this.renderNextBatch();
+    },
+
+    getFilteredItems() {
+        let filtered = AppState.allItems;
+        if (AppState.currentCategory !== 'all') {
+            filtered = filtered.filter(item => item.category === AppState.currentCategory);
+        }
+        if (AppState.searchQuery) {
+            filtered = filtered.filter(item => item.name.toLowerCase().includes(AppState.searchQuery));
+        }
+        return filtered;
+    },
+
+    renderNextBatch() {
         const menuGrid = document.getElementById('menuGrid');
-        if (items.length === 0) {
-            menuGrid.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No items found.</p>';
+        const filtered = AppState.filteredItems;
+        const start = AppState.displayedCount;
+        const end = Math.min(start + AppState.itemsPerPage, filtered.length);
+
+        if (filtered.length === 0 && start === 0) {
+            menuGrid.innerHTML = '<p style="text-align: center; color: var(--text-secondary); grid-column: 1 / -1;">No items found.</p>';
+            this.updateLoadMoreButton(0);
             return;
         }
-        menuGrid.innerHTML = items.map(item => `
+
+        const itemsToRender = filtered.slice(start, end);
+        const html = itemsToRender.map(item => this.renderItemCard(item)).join('');
+
+        if (start === 0) {
+            menuGrid.innerHTML = html;
+        } else {
+            menuGrid.insertAdjacentHTML('beforeend', html);
+        }
+
+        AppState.displayedCount = end;
+        this.updateLoadMoreButton(filtered.length);
+    },
+
+    renderItemCard(item) {
+        const desc = item.description
+            ? `<p class="menu-item-desc">${item.description}</p>`
+            : '';
+        return `
             <div class="menu-item" data-category="${item.category}" data-id="${item.id}">
                 <img src="${item.image_url}" alt="${item.name}" class="menu-item-image" onerror="this.src='/images/placeholder.jpg'">
                 <div class="menu-item-content">
@@ -162,6 +207,7 @@ const MenuDisplay = {
                         <span class="menu-item-price">$${parseFloat(item.price).toFixed(2)}</span>
                     </div>
                     <span class="menu-item-category">${item.category}</span>
+                    ${desc}
                     <div class="availability-badge ${item.is_available ? 'available' : 'unavailable'}">
                         ${item.is_available ? '✓ Available' : '✗ Not Available'}
                     </div>
@@ -177,7 +223,27 @@ const MenuDisplay = {
                     </div>
                 </div>
             </div>
-        `).join('');
+        `;
+    },
+
+    updateLoadMoreButton(totalItems) {
+        const wrap = document.getElementById('loadMoreWrap');
+        const btn = document.getElementById('loadMoreBtn');
+        if (!wrap || !btn) return;
+
+        if (AppState.displayedCount >= totalItems) {
+            wrap.classList.add('hidden');
+        } else {
+            wrap.classList.remove('hidden');
+            btn.textContent = `Load More (${totalItems - AppState.displayedCount} remaining)`;
+        }
+    },
+
+    setupLoadMore() {
+        const btn = document.getElementById('loadMoreBtn');
+        if (btn) {
+            btn.addEventListener('click', () => this.renderNextBatch());
+        }
     },
 
     addToCart(id) {
@@ -196,7 +262,7 @@ const MenuDisplay = {
     setupSearch() {
         document.getElementById('searchInput').addEventListener('input', (e) => {
             AppState.searchQuery = e.target.value.toLowerCase();
-            this.filterItems();
+            this.resetAndRender();
         });
     },
 
@@ -206,20 +272,13 @@ const MenuDisplay = {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 AppState.currentCategory = btn.dataset.category;
-                this.filterItems();
+                this.resetAndRender();
             });
         });
     },
 
     filterItems() {
-        let filtered = AppState.allItems;
-        if (AppState.currentCategory !== 'all') {
-            filtered = filtered.filter(item => item.category === AppState.currentCategory);
-        }
-        if (AppState.searchQuery) {
-            filtered = filtered.filter(item => item.name.toLowerCase().includes(AppState.searchQuery));
-        }
-        this.renderItems(filtered);
+        this.resetAndRender();
     }
 };
 
@@ -363,6 +422,47 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // ============================================
+// Hamburger Menu Toggle
+// ============================================
+function initHamburger() {
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    const overlay = document.getElementById('navOverlay');
+    if (!hamburger || !navLinks) return;
+
+    function closeMenu() {
+        hamburger.classList.remove('active');
+        navLinks.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+    }
+
+    function toggleMenu() {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('active');
+    }
+
+    hamburger.addEventListener('click', toggleMenu);
+
+    // Close when overlay is clicked
+    if (overlay) {
+        overlay.addEventListener('click', closeMenu);
+    }
+
+    // Close menu when a nav link is clicked
+    navLinks.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', closeMenu);
+    });
+
+    // Close menu on outside click
+    document.addEventListener('click', (e) => {
+        if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+            closeMenu();
+        }
+    });
+}
+
+// ============================================
 // Login Modal Wiring
 // ============================================
 function initLoginModal() {
@@ -428,6 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Auth.init();
     initLoginModal();
     initAdminForms();
+    initHamburger();
     MenuDisplay.init();
     Checkout.init();
     Router.init();

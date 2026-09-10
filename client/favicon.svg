@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="crust" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#d97706"/>
+      <stop offset="100%" style="stop-color:#92400e"/>
+    </linearGradient>
+  </defs>
+  <!-- Pizza slice -->
+  <path d="M32 4 L10 58 Q32 52 54 58 Z" fill="url(#crust)" stroke="#78350f" stroke-width="1.5"/>
+  <!-- Cheese base -->
+  <path d="M32 8 L13 54 Q32 49 51 54 Z" fill="#fcd34d"/>
+  <!-- Pepperoni -->
+  <circle cx="28" cy="28" r="4" fill="#dc2626"/>
+  <circle cx="38" cy="38" r="4" fill="#dc2626"/>
+  <circle cx="30" cy="46" r="3.5" fill="#dc2626"/>
+  <!-- Cheese spots -->
+  <circle cx="35" cy="22" r="2" fill="#f59e0b" opacity="0.7"/>
+  <circle cx="24" cy="40" r="2.5" fill="#f59e0b" opacity="0.7"/>
+  <circle cx="40" cy="48" r="2" fill="#f59e0b" opacity="0.7"/>
+</svg>

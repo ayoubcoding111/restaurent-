@@ -235,11 +235,14 @@ const AdminDashboard = {
             container.innerHTML = '<p class="empty-text">No items yet.</p>';
             return;
         }
-        container.innerHTML = items.map(item => `
+        container.innerHTML = items.map(item => {
+            const desc = item.description ? `<p class="admin-item-desc">${item.description}</p>` : '';
+            return `
             <div class="admin-item">
                 <img src="${item.image_url}" alt="${item.name}" class="admin-item-image" onerror="this.src='/images/placeholder.jpg'">
                 <div class="admin-item-info">
                     <h4>${item.name}</h4>
+                    ${desc}
                     <p>Price: $${parseFloat(item.price).toFixed(2)}</p>
                     <p>Category: ${item.category}</p>
                     <p>Status: ${item.is_available ? 'Available' : 'Not Available'}</p>
@@ -252,7 +255,8 @@ const AdminDashboard = {
                     <button class="btn-delete" onclick="AdminDashboard.deleteItem(${item.id})">Delete</button>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
     },
 
     async handleAddItem(e) {

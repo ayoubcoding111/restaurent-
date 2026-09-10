@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Delicious Restaurant - Order Now!</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -13,7 +14,13 @@
         <div class="logo">
           <h1>🍕 Delicious</h1>
         </div>
-        <div class="nav-links">
+        <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="nav-overlay" id="navOverlay"></div>
+        <div class="nav-links" id="navLinks">
           <a href="#home" class="nav-link">Home</a>
           <a href="#menu" class="nav-link">Menu</a>
           <a href="#contact" class="nav-link">Contact</a>
@@ -76,6 +83,9 @@
           </div>
         </div>
         <div id="menuGrid" class="menu-grid"></div>
+        <div class="load-more-wrap" id="loadMoreWrap">
+          <button class="btn btn-primary btn-load-more" id="loadMoreBtn">Load More</button>
+        </div>
       </div>
     </section>
 
@@ -199,6 +209,14 @@
                     <option value="familypack">Family Pack</option>
                   </select>
                 </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="adminItemDesc">Description</label>
+                  <textarea id="adminItemDesc" name="description" rows="3" placeholder="A short description of the item..."></textarea>
+                </div>
+              </div>
+              <div class="form-row">
                 <div class="form-group">
                   <label for="adminItemImage">Image *</label>
                   <input type="file" id="adminItemImage" name="image" accept="image/*" required />
@@ -215,9 +233,55 @@
 
     <!-- Footer -->
     <footer class="footer" id="mainFooter">
-      <div class="container footer-content">
-        <p>&copy; 2026 Delicious Restaurant. All rights reserved.</p>
-        <div id="footerAuth" class="footer-auth"></div>
+      <div class="container">
+        <div class="footer-grid">
+          <!-- Restaurant Contact -->
+          <div class="footer-section">
+            <h4>📬 Contact Us</h4>
+            <ul class="footer-contact-list">
+              <li><span class="footer-icon">📧</span> <a href="mailto:info@delicious-restaurant.com">info@delicious-restaurant.com</a></li>
+              <li><span class="footer-icon">📞</span> <a href="tel:+15551234567">(555) 123-4567</a></li>
+              <li><span class="footer-icon">📍</span> 123 Food Street, Flavor Town, FT 12345</li>
+            </ul>
+          </div>
+
+          <!-- Quick Links -->
+          <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul class="footer-links">
+              <li><a href="#home">Home</a></li>
+              <li><a href="#menu">Menu</a></li>
+              <li><a href="#contact">Contact</a></li>
+              <li><a href="#cart">Cart</a></li>
+            </ul>
+          </div>
+
+          <!-- Developer Attribution -->
+          <div class="footer-section">
+            <h4>Developed By</h4>
+            <p class="dev-name">Omar Ayoub Benkreira</p>
+            <ul class="footer-contact-list">
+              <li>
+                <span class="footer-icon">📧</span>
+                <a href="mailto:ayoubecom111@gmail.com">ayoubecom111@gmail.com</a>
+              </li>
+              <li>
+                <span class="footer-icon">💼</span>
+                <a href="https://www.linkedin.com/in/omar-ayoub-benkreira/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+              </li>
+              <li>
+                <span class="footer-icon">🐙</span>
+                <a href="https://github.com/ayoubcoding111" target="_blank" rel="noopener noreferrer">GitHub</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Bottom bar: copyright + auth -->
+        <div class="footer-bottom">
+          <p>&copy; 2026 Delicious Restaurant. All rights reserved.</p>
+          <div id="footerAuth" class="footer-auth"></div>
+        </div>
       </div>
     </footer>
 
