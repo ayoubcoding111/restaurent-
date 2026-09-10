@@ -20,10 +20,6 @@
           <a href="#cart" class="nav-link cart-link" id="cartLink">
             🛒 Cart <span class="cart-badge hidden" id="cartBadge">0</span>
           </a>
-          <button id="adminBtn" class="btn-admin hidden">
-            Admin Dashboard
-          </button>
-          <button id="loginBtn" class="btn-login">Admin Login</button>
           <label class="switch" aria-label="Toggle theme">
             <input type="checkbox" id="themeSwitch" />
             <span class="slider"></span>
@@ -69,31 +65,17 @@
     <section id="menu" class="menu">
       <div class="container">
         <h2 class="section-title">Our Menu</h2>
-
-        <!-- Search and Filter -->
         <div class="menu-controls">
-          <input
-            type="text"
-            id="searchInput"
-            class="search-input"
-            placeholder="Search menu items..."
-          />
-
+          <input type="text" id="searchInput" class="search-input" placeholder="Search menu items..." />
           <div class="filter-buttons">
             <button class="filter-btn active" data-category="all">All</button>
             <button class="filter-btn" data-category="pizzas">Pizzas</button>
             <button class="filter-btn" data-category="tacos">Tacos</button>
             <button class="filter-btn" data-category="drinks">Drinks</button>
-            <button class="filter-btn" data-category="familypack">
-              Family Pack
-            </button>
+            <button class="filter-btn" data-category="familypack">Family Pack</button>
           </div>
         </div>
-
-        <!-- Menu Items Grid -->
-        <div id="menuGrid" class="menu-grid">
-          <!-- Items will be loaded dynamically -->
-        </div>
+        <div id="menuGrid" class="menu-grid"></div>
       </div>
     </section>
 
@@ -113,9 +95,7 @@
     <section id="cartPage" class="page-section hidden">
       <div class="container">
         <h2 class="section-title">My Cart</h2>
-        <div id="cartItems" class="cart-items-list">
-          <!-- Cart items rendered by JS -->
-        </div>
+        <div id="cartItems" class="cart-items-list"></div>
         <div id="cartFooter" class="cart-footer hidden">
           <div class="cart-total">
             <span>Total:</span>
@@ -139,10 +119,105 @@
       </div>
     </section>
 
+    <!-- Staff Dashboard Section -->
+    <section id="staffDashboard" class="page-section dashboard-section hidden">
+      <div class="container">
+        <h2 class="section-title">Order Management</h2>
+        <div id="staffDashboardContent" class="dashboard-content"></div>
+      </div>
+    </section>
+
+    <!-- Admin Dashboard Section -->
+    <section id="adminDashboard" class="page-section dashboard-section hidden">
+      <div class="container">
+        <h2 class="section-title">Admin Dashboard</h2>
+
+        <div class="admin-dash-tabs">
+          <button class="admin-dash-tab active" data-tab="staff">Staff</button>
+          <button class="admin-dash-tab" data-tab="orders">Orders</button>
+          <button class="admin-dash-tab" data-tab="menu">Menu Items</button>
+        </div>
+
+        <!-- Staff Panel -->
+        <div id="adminPanel-staff" class="admin-dash-panel active">
+          <div class="staff-form-wrap">
+            <h3>Add New Staff</h3>
+            <form id="adminStaffForm" class="inline-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="staffUsername">Username *</label>
+                  <input type="text" id="staffUsername" name="username" required />
+                </div>
+                <div class="form-group">
+                  <label for="staffPassword">Password *</label>
+                  <input type="password" id="staffPassword" name="password" required />
+                </div>
+                <div class="form-group">
+                  <label for="staffFullName">Full Name *</label>
+                  <input type="text" id="staffFullName" name="full_name" required />
+                </div>
+                <div class="form-group">
+                  <label for="staffRoleSelect">Role</label>
+                  <select id="staffRoleSelect" name="role">
+                    <option value="staff">Staff</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm">Create Account</button>
+            </form>
+          </div>
+          <div class="staff-list"></div>
+        </div>
+
+        <!-- Orders Panel -->
+        <div id="adminPanel-orders" class="admin-dash-panel">
+          <div class="orders-list"></div>
+        </div>
+
+        <!-- Menu Panel -->
+        <div id="adminPanel-menu" class="admin-dash-panel">
+          <div class="menu-form-wrap">
+            <h3>Add Menu Item</h3>
+            <form id="adminAddItemForm" enctype="multipart/form-data" class="inline-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="adminItemName">Name *</label>
+                  <input type="text" id="adminItemName" name="name" required />
+                </div>
+                <div class="form-group">
+                  <label for="adminItemPrice">Price ($) *</label>
+                  <input type="number" id="adminItemPrice" name="price" step="0.01" min="0" required />
+                </div>
+                <div class="form-group">
+                  <label for="adminItemCategory">Category *</label>
+                  <select id="adminItemCategory" name="category" required>
+                    <option value="">Select</option>
+                    <option value="pizzas">Pizzas</option>
+                    <option value="tacos">Tacos</option>
+                    <option value="drinks">Drinks</option>
+                    <option value="familypack">Family Pack</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="adminItemImage">Image *</label>
+                  <input type="file" id="adminItemImage" name="image" accept="image/*" required />
+                  <div id="adminImagePreview" class="image-preview"></div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm">Add Item</button>
+            </form>
+          </div>
+          <div id="adminMenuList" class="admin-items-list"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer" id="mainFooter">
-      <div class="container">
+      <div class="container footer-content">
         <p>&copy; 2026 Delicious Restaurant. All rights reserved.</p>
+        <div id="footerAuth" class="footer-auth"></div>
       </div>
     </footer>
 
@@ -173,86 +248,26 @@
     <!-- Login Modal -->
     <div id="loginModal" class="modal">
       <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Admin Login</h2>
+        <span class="close-login">&times;</span>
+        <h2>Staff / Admin Login</h2>
         <form id="loginForm">
           <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required />
+            <label for="loginUsername">Username</label>
+            <input type="text" id="loginUsername" name="username" required />
           </div>
           <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required />
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" name="password" required />
           </div>
           <button type="submit" class="btn btn-primary">Login</button>
         </form>
       </div>
     </div>
 
-    <!-- Admin Dashboard Modal -->
-    <div id="adminModal" class="modal">
-      <div class="modal-content modal-large">
-        <span class="close-admin">&times;</span>
-        <h2>Admin Dashboard</h2>
-
-        <div class="admin-tabs">
-          <button class="tab-btn active" data-tab="add">Add Item</button>
-          <button class="tab-btn" data-tab="manage">Manage Items</button>
-        </div>
-
-        <!-- Add Item Tab -->
-        <div id="addTab" class="tab-content active">
-          <form id="addItemForm" enctype="multipart/form-data">
-            <div class="form-group">
-              <label for="itemName">Item Name *</label>
-              <input type="text" id="itemName" name="name" required />
-            </div>
-            <div class="form-group">
-              <label for="itemPrice">Price ($) *</label>
-              <input
-                type="number"
-                id="itemPrice"
-                name="price"
-                step="0.01"
-                min="0"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="itemCategory">Category *</label>
-              <select id="itemCategory" name="category" required>
-                <option value="">Select category</option>
-                <option value="pizzas">Pizzas</option>
-                <option value="tacos">Tacos</option>
-                <option value="drinks">Drinks</option>
-                <option value="familypack">Family Pack</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="itemImage">Image *</label>
-              <input
-                type="file"
-                id="itemImage"
-                name="image"
-                accept="image/*"
-                required
-              />
-              <div id="imagePreview" class="image-preview"></div>
-            </div>
-            <button type="submit" class="btn btn-primary">Add Item</button>
-          </form>
-        </div>
-
-        <!-- Manage Items Tab -->
-        <div id="manageTab" class="tab-content">
-          <div id="adminItemsList" class="admin-items-list">
-            <!-- Items will be loaded dynamically -->
-          </div>
-        </div>
-      </div>
-    </div>
-
     <script src="cart.js"></script>
+    <script src="auth.js"></script>
+    <script src="staff.js"></script>
+    <script src="admin.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

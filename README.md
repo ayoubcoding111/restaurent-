@@ -1,186 +1,154 @@
-# Restaurant Web Application
+# 🍕 Delicious Restaurant — Food Ordering Platform
 
-A complete, production-ready full-stack restaurant web application with menu management, admin dashboard, and dark/light theme support.
+A complete full-stack restaurant web application with customer ordering, WhatsApp integration, staff order management, and a full admin dashboard.
 
-## 🚀 Features
+## Features
 
-### Customer Features
-- **Modern Landing Page** with hero section and restaurant info
-- **Menu Display** with category filtering (Pizzas, Tacos, Drinks, Family Pack)
-- **Search Functionality** to find menu items by name
-- **Dark/Light Theme Toggle** with persistent preference
-- **Call to Order Section** with restaurant phone number
-- **Opening Hours** and contact information
-- **Responsive Design** for all device sizes
+### Customer (Public)
+- Modern landing page with hero, about cards, and contact info
+- Menu browsing with category filtering (Pizzas, Tacos, Drinks, Family Pack) and search
+- Shopping cart with quantity controls (localStorage-backed)
+- Checkout form → order saved to database + WhatsApp message sent
+- Dark/light theme toggle (persistent)
+- Fully responsive design
 
-### Admin Features
-- **Secure Admin Login** (hardcoded credentials)
-- **Add Menu Items** with image upload
-- **Delete Menu Items**
-- **Toggle Item Availability** (Available/Not Available)
-- **Real-time Menu Updates**
-- **Admin Dashboard** accessible only when logged in
+### Staff Dashboard (`#staff`)
+- Welcome header with logout
+- Live order list with status badges (Pending / Confirmed / Delivered)
+- Filter orders by status
+- Update order status: Pending → Confirmed → Delivered
 
-## 🛠️ Technology Stack
+### Admin Dashboard (`#admin`)
+Three-tab interface:
 
-- **Frontend**: Vanilla HTML5, CSS3, JavaScript (ES6+)
-- **Backend**: Node.js with Express.js
-- **Database**: MySQL
-- **File Uploads**: Multer
-- **Styling**: Custom CSS with CSS Variables for theming
+| Tab | Features |
+|-----|----------|
+| **Staff** | Create new staff accounts (username, password, name, role), list all staff, delete accounts |
+| **Orders** | Master view of all orders with status filtering, update any order status |
+| **Menu Items** | Add new items (name, price, category, image upload), toggle availability, delete items |
 
-## 📋 Prerequisites
+### Auth
+- Role-based authentication (Admin / Staff) via token-based sessions
+- Footer login button → login modal
+- Automatic redirect to appropriate dashboard after login
+- Default admin: `admin` / `admin123`
 
-- Node.js (v14 or higher)
-- MySQL Server (v5.7 or higher)
-- npm or yarn package manager
+## Tech Stack
 
-## ⚙️ Installation & Setup
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Vanilla HTML5, CSS3, JavaScript (ES6+) |
+| Backend | Node.js + Express.js |
+| Database | MySQL (mysql2 driver) |
+| Auth | bcryptjs + in-memory token sessions |
+| File Uploads | Multer |
 
-### 1. Install Dependencies
+## Project Structure
 
+```
+Project2/
+├── client/                  # Frontend (served by Express)
+│   ├── index.html           # SPA entry point
+│   ├── styles.css           # All styles (themes, dashboard, responsive)
+│   ├── app.js               # Core app: router, menu, cart, checkout, init
+│   ├── cart.js              # Cart module (localStorage)
+│   ├── auth.js              # Auth module (token, role, footer login)
+│   ├── staff.js             # Staff dashboard (order management)
+│   ├── admin.js             # Admin dashboard (staff/orders/menu tabs)
+│   └── imgs/                # Static images (hero, sample food)
+├── server/
+│   ├── server.js            # Express server + all API routes
+│   ├── config/db.js         # MySQL connection pool
+│   ├── database.sql         # DB schema + sample data
+│   ├── uploads/             # Uploaded menu item images
+│   ├── .env                 # Environment config (git-ignored)
+│   └── package.json
+├── .gitignore
+└── README.md
+```
+
+## API Endpoints
+
+### Public
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/items` | Get all menu items |
+
+### Auth
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/login` | Login (returns token + role) |
+| POST | `/api/auth/logout` | Logout (invalidate token) |
+| GET | `/api/auth/me` | Get current user info |
+
+### Orders
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/orders` | No | Place a new order |
+| GET | `/api/orders` | Yes | Get all orders (staff/admin) |
+| PATCH | `/api/orders/:id/status` | Yes | Update order status |
+
+### Staff Management (Admin only)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/staff` | List all staff accounts |
+| POST | `/api/staff` | Create a staff account |
+| DELETE | `/api/staff/:id` | Delete a staff account |
+
+### Menu Items
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/items` | No | Get all items |
+| GET | `/api/items/:id` | No | Get single item |
+| POST | `/api/items` | Admin | Add new item (multipart) |
+| PATCH | `/api/items/:id/availability` | Admin | Toggle availability |
+| DELETE | `/api/items/:id` | Admin | Delete item |
+
+## Setup
+
+### 1. Install dependencies
 ```bash
+cd server
 npm install
 ```
 
-### 2. Setup MySQL Database
-
-Create the database and tables by running the SQL script:
-
+### 2. Configure database
 ```bash
+# Edit server/.env with your MySQL credentials
+# Then run the schema:
 mysql -u root -p < database.sql
 ```
 
-Or manually execute the `database.sql` file in your MySQL client.
+### 3. Start the server
+```bash
+npm start
+# or for development:
+npm run dev
+```
 
-### 3. Configure Environment Variables
+### 4. Open the app
+- **URL**: http://localhost:3000
+- **Admin login**: `admin` / `admin123`
 
-Create a `.env` file in the root directory (use `.env.example` as template):
+## Environment Variables
 
+Create `server/.env`:
 ```env
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=your_mysql_password
+DB_PASSWORD=your_password
 DB_NAME=restaurant_db
 PORT=3000
 ```
 
-### 4. Setup Sample Images
+## Database Schema
 
-Create the following directories and add sample images:
-
-```bash
-mkdir -p public/images
-mkdir -p public/uploads
+```sql
+items:      id, name, price, category, image_url, is_available, created_at, updated_at
+staff:      id, username, password (bcrypt), full_name, role, created_at
+orders:     id, customer_name, customer_phone, customer_address, items (JSON), total, status, created_at, updated_at
 ```
 
-Place your sample images:
-- `public/images/frontpic.png` - Hero background image
-- `public/uploads/pizza1.jpg` - Sample pizza image
-- `public/uploads/taco1.jpg` - Sample taco image
-- `public/uploads/drink1.jpg` - Sample drink image
+## License
 
-### 5. Start the Server
-
-```bash
-npm start
-```
-
-Or for development with auto-restart:
-
-```bash
-npm run dev
-```
-
-The application will be available at: `http://localhost:3000`
-
-## 🔐 Admin Access
-
-**Default Admin Credentials:**
-- Username: `admin`
-- Password: `admin123`
-
-**Important**: Change these credentials in `server.js` for production use.
-
-## 📁 Project Structure
-
-```
-server/
-├── config/
-│   └── db.js                 # Database configuration
-├── public/
-│   ├── css/
-│   │   └── styles.css        # Main stylesheet with theming
-│   ├── js/
-│   │   └── app.js            # Frontend JavaScript
-│   ├── images/               # Static images
-│   │   └── frontpic.png
-│   └── index.html            # Main HTML file
-├── uploads/                  # Uploaded menu item images
-├── database.sql              # Database setup script
-├── server.js                 # Express server
-├── package.json              # Dependencies
-├── .env.example              # Environment variables template
-└── README.md                 # This file
-```
-
-## 🎨 Theme Colors
-
-The application uses a **Red** accent color scheme:
-- Primary: `#dc2626`
-- Primary Dark: `#b91c1c`
-- Primary Light: `#ef4444`
-
-Supports both light and dark modes with automatic theme persistence.
-
-## 🔧 API Endpoints
-
-### Public Endpoints
-- `GET /api/items` - Get all menu items
-
-### Admin Endpoints
-- `POST /api/admin/login` - Admin login
-- `POST /api/items` - Add new menu item (with image upload)
-- `PATCH /api/items/:id/availability` - Toggle item availability
-- `DELETE /api/items/:id` - Delete menu item
-
-## 📱 Responsive Breakpoints
-
-- Desktop: 1200px+
-- Tablet: 768px - 1199px
-- Mobile: < 768px
-
-## 🐛 Troubleshooting
-
-### Database Connection Issues
-- Verify MySQL is running
-- Check credentials in `.env` file
-- Ensure database `restaurant_db` exists
-
-### Image Upload Issues
-- Verify `uploads/` directory exists and is writable
-- Check file size (max 5MB)
-- Ensure allowed image formats (jpg, jpeg, png, gif, webp)
-
-### Port Already in Use
-- Change `PORT` in `.env` file
-- Or kill the process using port 3000
-
-## 🚀 Production Deployment
-
-1. Change admin credentials in `server.js`
-2. Set strong database password
-3. Configure proper CORS settings
-4. Enable HTTPS
-5. Use environment variables for all sensitive data
-6. Implement rate limiting
-7. Add input validation and sanitization
-8. Setup proper error logging
-
-## 📄 License
-
-This project is open source and available for modification and distribution.
-
-## 👨‍💻 Support
-
-For issues or questions, please refer to the documentation or contact the development team.
+Open source — free to modify and distribute.
