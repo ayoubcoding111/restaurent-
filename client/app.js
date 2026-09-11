@@ -12,6 +12,41 @@ const AppState = {
 };
 
 // ============================================
+// Scroll Reveal Animation
+// ============================================
+const ScrollReveal = {
+    observer: null,
+
+    init() {
+        if (!('IntersectionObserver' in window)) {
+            // Fallback: show everything immediately
+            document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+            return;
+        }
+
+        this.observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    this.observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.15,
+            rootMargin: '0px 0px -40px 0px'
+        });
+
+        this.observe();
+    },
+
+    observe() {
+        document.querySelectorAll('.reveal:not(.active)').forEach(el => {
+            this.observer.observe(el);
+        });
+    }
+};
+
+// ============================================
 // API Service
 // ============================================
 const API = {
@@ -39,6 +74,10 @@ const Router = {
     },
 
     init() {
+        // Scroll to top on fresh page load (prevents browser scroll restoration)
+        if (!location.hash || location.hash === '#' || location.hash === '#home') {
+            window.scrollTo(0, 0);
+        }
         window.addEventListener('hashchange', () => this.navigate());
         this.navigate();
     },
@@ -89,6 +128,9 @@ const Router = {
         } else {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        // Re-observe any newly visible reveal elements
+        if (ScrollReveal.observer) ScrollReveal.observe();
     }
 };
 
@@ -192,6 +234,9 @@ const MenuDisplay = {
 
         AppState.displayedCount = end;
         this.updateLoadMoreButton(filtered.length);
+
+        // Re-observe newly added reveal elements
+        if (ScrollReveal.observer) ScrollReveal.observe();
     },
 
     renderItemCard(item) {
@@ -199,7 +244,7 @@ const MenuDisplay = {
             ? `<p class="menu-item-desc">${item.description}</p>`
             : '';
         return `
-            <div class="menu-item" data-category="${item.category}" data-id="${item.id}">
+            <div class="menu-item reveal" data-category="${item.category}" data-id="${item.id}">
                 <img src="${item.image_url}" alt="${item.name}" class="menu-item-image" onerror="this.src='/images/placeholder.jpg'">
                 <div class="menu-item-content">
                     <div class="menu-item-header">
@@ -529,6 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initLoginModal();
     initAdminForms();
     initHamburger();
+    ScrollReveal.init();
     MenuDisplay.init();
     Checkout.init();
     Router.init();
