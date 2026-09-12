@@ -363,9 +363,6 @@ const MenuDisplay = {
         });
     },
 
-    filterItems() {
-        this.resetAndRender();
-    }
 };
 
 // ============================================
@@ -1026,7 +1023,7 @@ function initLoginModal() {
             showFormMsg('resetError', 'Password must be at least 6 characters.');
             return;
         }
-        const token = Auth.resetToken || Auth.getResetTokenFromHash();
+        const token = Auth.getResetTokenFromHash();
         if (!token) {
             showFormMsg('resetError', 'Missing reset token. Please use the link from your email.');
             return;

@@ -35,35 +35,54 @@ const Cart = {
     return this.getItems().reduce((sum, i) => sum + i.price * i.quantity, 0);
   },
 
-  addItem(product, qty = 1) {
+  addItem(product, qty = 1, options = []) {
+    const opts = (options || [])
+      .map(o => ({
+        id: o.id,
+        name_en: o.name_en || o.name || '',
+        name_fr: o.name_fr || null,
+        name_ar: o.name_ar || null,
+        group_en: o.group_en || o.group_name || o.group || '',
+        group_fr: o.group_fr || null,
+        group_ar: o.group_ar || null,
+        price_delta: Number(o.price_delta) || 0
+      }))
+      .sort((a, b) => a.id - b.id);
+    const key = `${product.id}|${opts.map(o => o.id).join(',')}`;
+    const unit = parseFloat(product.price) + opts.reduce((s, o) => s + o.price_delta, 0);
     const items = this._load();
-    const existing = items.find(i => i.id === product.id);
+    const existing = items.find(i => (i.key || String(i.id)) === key);
     if (existing) {
       existing.quantity += qty;
+      existing.key = key;
+      existing.options = opts;
+      existing.price = unit;
     } else {
       items.push({
+        key,
         id: product.id,
         name: product.name,
-        price: parseFloat(product.price),
+        price: unit,
         image_url: product.image_url,
         category: product.category,
+        options: opts,
         quantity: qty
       });
     }
     this._save(items);
   },
 
-  removeItem(id) {
-    const items = this._load().filter(i => i.id !== id);
+  removeItem(key) {
+    const items = this._load().filter(i => (i.key || String(i.id)) !== String(key));
     this._save(items);
   },
 
-  updateQuantity(id, qty) {
+  updateQuantity(key, qty) {
     const items = this._load();
-    const item = items.find(i => i.id === id);
+    const item = items.find(i => (i.key || String(i.id)) === String(key));
     if (!item) return;
     if (qty <= 0) {
-      this.removeItem(id);
+      this.removeItem(key);
       return;
     }
     item.quantity = qty;

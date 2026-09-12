@@ -8,6 +8,7 @@ const SHELL = [
   './app.js?v=5',
   './cart.js',
   './auth.js',
+  './ui.js',
   './staff.js',
   './admin.js?v=5',
   './i18n.js',

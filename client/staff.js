@@ -152,9 +152,14 @@ const KitchenFlow = {
         return this.staffCache;
     },
 
+    invalidateStaffCache() {
+        this.staffCache = null;
+    },
+
     // Single order-list fetcher shared by both dashboards (and their pollers).
-    async fetchOrders() {
-        const res = await Auth.authFetch('/api/orders');
+    // Pass a query string for non-default windows, e.g. '?limit=1000'.
+    async fetchOrders(query = '') {
+        const res = await Auth.authFetch('/api/orders' + query);
         const data = await res.json();
         if (!data.success) throw new Error(data.message);
         return data.data;
@@ -263,15 +268,7 @@ const StaffDashboard = {
                 <button class="btn btn-secondary btn-sm" onclick="Auth.logout()">Logout</button>
             </div>
             ${KitchenAlerts.liveControlsHtml()}
-            <div class="dash-filters">
-                <button class="filter-btn active" data-filter="all" onclick="StaffDashboard.setFilter('all')">All</button>
-                <button class="filter-btn" data-filter="pending" onclick="StaffDashboard.setFilter('pending')">${KitchenFlow.label('pending')}</button>
-                <button class="filter-btn" data-filter="confirmed" onclick="StaffDashboard.setFilter('confirmed')">✓ ${KitchenFlow.label('confirmed')}</button>
-                <button class="filter-btn" data-filter="preparing" onclick="StaffDashboard.setFilter('preparing')">${KitchenFlow.label('preparing')}</button>
-                <button class="filter-btn" data-filter="ready" onclick="StaffDashboard.setFilter('ready')">${KitchenFlow.label('ready')}</button>
-                <button class="filter-btn" data-filter="on_way" onclick="StaffDashboard.setFilter('on_way')">${KitchenFlow.label('on_way')}</button>
-                <button class="filter-btn" data-filter="delivered" onclick="StaffDashboard.setFilter('delivered')">${KitchenFlow.label('delivered')}</button>
-            </div>
+            ${UI.renderOrderFilterBar(this.currentFilter, 'StaffDashboard.setFilter')}
             <div id="staffOrdersList" class="orders-list"><p class="loading-text">Loading orders...</p></div>
         `;
         await KitchenFlow.ensureStaff();

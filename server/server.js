@@ -8,7 +8,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
 const db = require('./config/db');
-const { sendPasswordResetEmail, isMailConfigured } = require('./config/mailer');
+const { sendPasswordResetEmail } = require('./config/mailer');
 // Single source of truth for validation rules (also loaded by the browser).
 // Changing a rule in client/validators.js changes it on both sides.
 const { PASSWORD_MIN, normalizeDZPhone, isValidDZPhone, isValidEmail } = require('../client/validators');
@@ -21,7 +21,10 @@ const uploadsDir = path.join(__dirname, 'uploads');
 // ============================================
 // Middleware
 // ============================================
-app.use(cors());
+app.use(cors({
+    origin: process.env.CLIENT_URL || `http://localhost:${PORT}`,
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(clientDir));
@@ -100,17 +103,33 @@ function generateToken() {
     return crypto.randomBytes(32).toString('hex');
 }
 
+// Parse a single cookie value from the raw Cookie header.
+function parseCookie(cookieHeader, name) {
+    if (!cookieHeader) return null;
+    const match = cookieHeader.split(';').map(c => c.trim()).find(c => c.startsWith(name + '='));
+    return match ? decodeURIComponent(match.split('=').slice(1).join('=')) : null;
+}
+
+const AUTH_COOKIE = 'auth_token';
+
 function authenticateToken(req, res, next) {
+    // Accept Bearer token (header) or httpOnly cookie — whichever is present.
+    let token;
     const header = req.headers.authorization;
-    if (!header || !header.startsWith('Bearer ')) {
+    if (header && header.startsWith('Bearer ')) {
+        token = header.split(' ')[1];
+    } else {
+        token = parseCookie(req.headers.cookie, AUTH_COOKIE);
+    }
+    if (!token) {
         return res.status(401).json({ success: false, message: 'Authentication required' });
     }
-    const token = header.split(' ')[1];
     const session = sessions.get(token);
     if (!session) {
         return res.status(401).json({ success: false, message: 'Invalid or expired token' });
     }
     req.user = session;
+    req.token = token;
     next();
 }
 
@@ -156,6 +175,14 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
         }
         const token = generateToken();
         sessions.set(token, { userId: user.id, role: user.role, username: user.username, email: user.email, full_name: user.full_name });
+        // Set httpOnly cookie — invisible to JavaScript, sent automatically by the browser.
+        const isProd = process.env.NODE_ENV === 'production';
+        res.cookie(AUTH_COOKIE, token, {
+            httpOnly: true,
+            secure: isProd,
+            sameSite: isProd ? 'strict' : 'lax',
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        });
         res.json({ success: true, token, role: user.role, username: user.username, full_name: user.full_name });
     } catch (error) {
         console.error('Login error:', error);
@@ -245,8 +272,8 @@ app.post('/api/auth/reset-password', authLimiter, async (req, res) => {
 });
 
 app.post('/api/auth/logout', authenticateToken, (req, res) => {
-    const token = req.headers.authorization.split(' ')[1];
-    sessions.delete(token);
+    sessions.delete(req.token);
+    res.clearCookie(AUTH_COOKIE);
     res.json({ success: true });
 });
 
@@ -481,19 +508,32 @@ app.post('/api/orders', orderLimiter, async (req, res) => {
 
 app.get('/api/orders', authenticateToken, async (req, res) => {
     try {
-        let rows;
-        try {
-            [rows] = await db.query(
-                `SELECT o.*, dz.name AS zone_name, s.full_name AS assigned_name
-                 FROM orders o
-                 LEFT JOIN delivery_zones dz ON dz.id = o.zone_id
-                 LEFT JOIN staff s ON s.id = o.assigned_to
-                 ORDER BY o.created_at DESC`
-            );
-        } catch {
-            // Fallback for DBs where the zone/assign migration hasn't run yet
-            [rows] = await db.query('SELECT * FROM orders ORDER BY created_at DESC');
+        // Keyset pagination: ?limit= (default 200, max 1000), ?before=<id>.
+        // Orders are never deleted, so an unbounded SELECT would grow forever.
+        let limit = parseInt(req.query.limit, 10);
+        if (!Number.isFinite(limit) || limit <= 0) limit = 200;
+        limit = Math.min(1000, limit);
+        const before = req.query.before != null && req.query.before !== ''
+            ? parseInt(req.query.before, 10) : null;
+        const params = [];
+        let idFilter = '';
+        if (before != null) {
+            if (!Number.isInteger(before)) {
+                return res.status(400).json({ success: false, message: 'Invalid before cursor' });
+            }
+            idFilter = 'WHERE o.id < ?';
+            params.push(before);
         }
+        params.push(limit);
+        const [rows] = await db.query(
+            `SELECT o.*, dz.name AS zone_name, s.full_name AS assigned_name
+             FROM orders o
+             LEFT JOIN delivery_zones dz ON dz.id = o.zone_id
+             LEFT JOIN staff s ON s.id = o.assigned_to
+             ${idFilter}
+             ORDER BY o.id DESC LIMIT ?`,
+            params
+        );
         // Parse items JSON
         rows.forEach(row => {
             try { row.items = typeof row.items === 'string' ? JSON.parse(row.items) : row.items; }
@@ -711,7 +751,7 @@ app.get('/api/analytics', requireAdmin, async (req, res) => {
                AND created_at < DATE_SUB(CURDATE(), INTERVAL ? DAY)`,
             [days * 2 - 1, days]
         );
-        const [allItems] = await db.query('SELECT items FROM orders');
+        const [allItems] = await db.query('SELECT items FROM orders ORDER BY id DESC LIMIT 5000');
         const map = new Map();
         allItems.forEach(row => {
             let items = [];
@@ -1017,148 +1057,169 @@ app.get('*', (req, res) => {
 // Migration: add description column if missing
 // ============================================
 async function migrateDB() {
-    try {
-        const [cols] = await db.query("SHOW COLUMNS FROM items LIKE 'description'");
-        if (cols.length === 0) {
-            await db.query('ALTER TABLE items ADD COLUMN description TEXT DEFAULT NULL AFTER category');
-            console.log('✅ Added description column to items table');
-        }
-        // Staff: real email login + password reset
-        const [emailCols] = await db.query("SHOW COLUMNS FROM staff LIKE 'email'");
-        if (emailCols.length === 0) {
-            await db.query('ALTER TABLE staff ADD COLUMN email VARCHAR(255) UNIQUE NULL AFTER username');
-            console.log('✅ Added email column to staff table');
-        }
-        const [tokenCols] = await db.query("SHOW COLUMNS FROM staff LIKE 'reset_token'");
-        if (tokenCols.length === 0) {
-            await db.query('ALTER TABLE staff ADD COLUMN reset_token VARCHAR(128) DEFAULT NULL AFTER role');
-            console.log('✅ Added reset_token column to staff table');
-        }
-        const [expCols] = await db.query("SHOW COLUMNS FROM staff LIKE 'reset_expires'");
-        if (expCols.length === 0) {
-            await db.query('ALTER TABLE staff ADD COLUMN reset_expires DATETIME DEFAULT NULL AFTER reset_token');
-            console.log('✅ Added reset_expires column to staff table');
-        }
-        // Item customization options (ingredients, sizes…)
-        await db.query(`CREATE TABLE IF NOT EXISTS item_options (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            item_id INT NOT NULL,
-            group_name VARCHAR(100) NOT NULL DEFAULT 'Extras',
-            name VARCHAR(255) NOT NULL,
-            price_delta DECIMAL(10, 2) NOT NULL DEFAULT 0,
-            choice ENUM('single', 'multi') NOT NULL DEFAULT 'multi',
-            sort_order INT NOT NULL DEFAULT 0,
-            FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
-        )`);
-        for (const col of ['group_fr VARCHAR(100) DEFAULT NULL', 'group_ar VARCHAR(100) DEFAULT NULL',
-                           'name_fr VARCHAR(255) DEFAULT NULL', 'name_ar VARCHAR(255) DEFAULT NULL']) {
-            const colName = col.split(' ')[0];
-            const [has] = await db.query('SHOW COLUMNS FROM item_options LIKE ?', [colName]);
-            if (has.length === 0) {
-                await db.query(`ALTER TABLE item_options ADD COLUMN ${col}`);
-                console.log(`✅ Added ${colName} column to item_options`);
+    // Each migration step is wrapped individually so a failure in one
+    // does not prevent the rest from running.
+    const steps = [
+        async () => {
+            const [cols] = await db.query("SHOW COLUMNS FROM items LIKE 'description'");
+            if (cols.length === 0) {
+                await db.query('ALTER TABLE items ADD COLUMN description TEXT DEFAULT NULL AFTER category');
+                console.log('✅ Added description column to items table');
+            }
+        },
+        async () => {
+            const [emailCols] = await db.query("SHOW COLUMNS FROM staff LIKE 'email'");
+            if (emailCols.length === 0) {
+                await db.query('ALTER TABLE staff ADD COLUMN email VARCHAR(255) UNIQUE NULL AFTER username');
+                console.log('✅ Added email column to staff table');
+            }
+        },
+        async () => {
+            const [tokenCols] = await db.query("SHOW COLUMNS FROM staff LIKE 'reset_token'");
+            if (tokenCols.length === 0) {
+                await db.query('ALTER TABLE staff ADD COLUMN reset_token VARCHAR(128) DEFAULT NULL AFTER role');
+                console.log('✅ Added reset_token column to staff table');
+            }
+        },
+        async () => {
+            const [expCols] = await db.query("SHOW COLUMNS FROM staff LIKE 'reset_expires'");
+            if (expCols.length === 0) {
+                await db.query('ALTER TABLE staff ADD COLUMN reset_expires DATETIME DEFAULT NULL AFTER reset_token');
+                console.log('✅ Added reset_expires column to staff table');
+            }
+        },
+        async () => {
+            await db.query(`CREATE TABLE IF NOT EXISTS item_options (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                item_id INT NOT NULL,
+                group_name VARCHAR(100) NOT NULL DEFAULT 'Extras',
+                name VARCHAR(255) NOT NULL,
+                price_delta DECIMAL(10, 2) NOT NULL DEFAULT 0,
+                choice ENUM('single', 'multi') NOT NULL DEFAULT 'multi',
+                sort_order INT NOT NULL DEFAULT 0,
+                FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
+            )`);
+            for (const col of ['group_fr VARCHAR(100) DEFAULT NULL', 'group_ar VARCHAR(100) DEFAULT NULL',
+                               'name_fr VARCHAR(255) DEFAULT NULL', 'name_ar VARCHAR(255) DEFAULT NULL']) {
+                const colName = col.split(' ')[0];
+                const [has] = await db.query('SHOW COLUMNS FROM item_options LIKE ?', [colName]);
+                if (has.length === 0) {
+                    await db.query(`ALTER TABLE item_options ADD COLUMN ${col}`);
+                    console.log(`✅ Added ${colName} column to item_options`);
+                }
+            }
+        },
+        async () => {
+            const [[optCount]] = await db.query('SELECT COUNT(*) AS c FROM item_options');
+            if (Number(optCount.c) === 0) {
+                await db.query(`INSERT INTO item_options (item_id, group_name, name, price_delta, choice, sort_order)
+                    SELECT id, 'Extra ingredients', 'Extra Cheese', 2.50, 'multi', 1 FROM items WHERE category = 'pizzas'
+                    UNION ALL SELECT id, 'Extra ingredients', 'Mushrooms', 1.50, 'multi', 2 FROM items WHERE category = 'pizzas'
+                    UNION ALL SELECT id, 'Extra ingredients', 'Olives', 1.00, 'multi', 3 FROM items WHERE category = 'pizzas'
+                    UNION ALL SELECT id, 'Extra ingredients', 'Extra Meat', 3.00, 'multi', 1 FROM items WHERE category = 'tacos'
+                    UNION ALL SELECT id, 'Extra ingredients', 'Cheese', 1.50, 'multi', 2 FROM items WHERE category = 'tacos'
+                    UNION ALL SELECT id, 'Extra ingredients', 'Guacamole', 2.00, 'multi', 3 FROM items WHERE category = 'tacos'
+                    UNION ALL SELECT id, 'Size', '30cl', 0.00, 'single', 1 FROM items WHERE category = 'drinks'
+                    UNION ALL SELECT id, 'Size', '1L', 2.00, 'single', 2 FROM items WHERE category = 'drinks'
+                    UNION ALL SELECT id, 'Size', '2L', 4.00, 'single', 3 FROM items WHERE category = 'drinks'
+                    UNION ALL SELECT id, 'Extras', 'Extra Wings', 5.00, 'multi', 1 FROM items WHERE category = 'familypack'
+                    UNION ALL SELECT id, 'Extras', 'Extra Drink', 2.00, 'multi', 2 FROM items WHERE category = 'familypack'`);
+                console.log('✅ Seeded sample item options');
+            }
+        },
+        async () => {
+            const optTranslations = [
+                ['Extra Cheese', 'Fromage supplémentaire', 'جبن إضافي', 'Extra ingredients', 'Ingrédients supplémentaires', 'مكونات إضافية'],
+                ['Mushrooms', 'Champignons', 'فطر', 'Extra ingredients', 'Ingrédients supplémentaires', 'مكونات إضافية'],
+                ['Olives', 'Olives', 'زيتون', 'Extra ingredients', 'Ingrédients supplémentaires', 'مكونات إضافية'],
+                ['Extra Meat', 'Viande supplémentaire', 'لحم إضافي', 'Extra ingredients', 'Ingrédients supplémentaires', 'مكونات إضافية'],
+                ['Cheese', 'Fromage', 'جبن', 'Extra ingredients', 'Ingrédients supplémentaires', 'مكونات إضافية'],
+                ['Guacamole', 'Guacamole', 'غواكامولي', 'Extra ingredients', 'Ingrédients supplémentaires', 'مكونات إضافية'],
+                ['30cl', '30cl', '30سل', 'Size', 'Taille', 'الحجم'],
+                ['1L', '1L', '1ل', 'Size', 'Taille', 'الحجم'],
+                ['2L', '2L', '2ل', 'Size', 'Taille', 'الحجم'],
+                ['Extra Wings', 'Ailes supplémentaires', 'أجنحة إضافية', 'Extras', 'Extras', 'إضافات'],
+                ['Extra Drink', 'Boisson supplémentaire', 'مشروب إضافي', 'Extras', 'Extras', 'إضافات']
+            ];
+            for (const [en, fr, ar, g, gfr, gar] of optTranslations) {
+                await db.query(
+                    `UPDATE item_options SET name_fr = ?, name_ar = ?, group_fr = ?, group_ar = ?
+                     WHERE name = ? AND name_fr IS NULL`, [fr, ar, gfr, gar, en]
+                );
+            }
+        },
+        async () => {
+            await db.query(`CREATE TABLE IF NOT EXISTS reviews (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                item_id INT NOT NULL,
+                rater_name VARCHAR(100) NOT NULL,
+                rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+                comment TEXT DEFAULT NULL,
+                is_approved TINYINT(1) NOT NULL DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
+            )`);
+        },
+        async () => {
+            await db.query(`CREATE TABLE IF NOT EXISTS delivery_zones (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                name_fr VARCHAR(100) DEFAULT NULL,
+                name_ar VARCHAR(100) DEFAULT NULL,
+                fee DECIMAL(10, 2) NOT NULL DEFAULT 0,
+                free_over DECIMAL(10, 2) DEFAULT NULL,
+                eta_min INT DEFAULT NULL,
+                is_active TINYINT(1) NOT NULL DEFAULT 1,
+                sort_order INT NOT NULL DEFAULT 0
+            )`);
+            const [[zoneCount]] = await db.query('SELECT COUNT(*) AS c FROM delivery_zones');
+            if (Number(zoneCount.c) === 0) {
+                await db.query(`INSERT INTO delivery_zones (name, name_fr, name_ar, fee, free_over, eta_min, is_active, sort_order) VALUES
+                    ('City Center', 'Centre-ville', 'وسط المدينة', 2.00, 30.00, 30, 1, 1),
+                    ('Suburbs', 'Banlieue', 'الضواحي', 4.00, 50.00, 45, 1, 2),
+                    ('Outskirts', 'Périphérie', 'الأطراف', 6.00, NULL, 60, 1, 3)`);
+                console.log('✅ Seeded delivery zones');
+            }
+        },
+        async () => {
+            for (const col of ['zone_id INT DEFAULT NULL', 'subtotal DECIMAL(10, 2) DEFAULT NULL', 'delivery_fee DECIMAL(10, 2) NOT NULL DEFAULT 0']) {
+                const colName = col.split(' ')[0];
+                const [has] = await db.query('SHOW COLUMNS FROM orders LIKE ?', [colName]);
+                if (has.length === 0) {
+                    await db.query(`ALTER TABLE orders ADD COLUMN ${col}`);
+                    console.log(`✅ Added ${colName} column to orders`);
+                }
+            }
+        },
+        async () => {
+            await db.query(`ALTER TABLE orders MODIFY status ENUM('pending', 'confirmed', 'preparing', 'ready', 'on_way', 'delivered') NOT NULL DEFAULT 'pending'`);
+            const [assCol] = await db.query("SHOW COLUMNS FROM orders LIKE 'assigned_to'");
+            if (assCol.length === 0) {
+                await db.query('ALTER TABLE orders ADD COLUMN assigned_to INT DEFAULT NULL');
+                console.log('✅ Added assigned_to column to orders');
+            }
+            try {
+                const [fk] = await db.query(
+                    `SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE
+                     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'orders' AND COLUMN_NAME = 'assigned_to'
+                     AND REFERENCED_TABLE_NAME = 'staff'`
+                );
+                if (fk.length === 0) {
+                    await db.query('ALTER TABLE orders ADD CONSTRAINT fk_orders_assigned FOREIGN KEY (assigned_to) REFERENCES staff(id) ON DELETE SET NULL');
+                    console.log('✅ Added assigned_to foreign key');
+                }
+            } catch (e) {
+                console.warn('⚠️  assigned_to FK note:', e.message);
             }
         }
-        const [[optCount]] = await db.query('SELECT COUNT(*) AS c FROM item_options');
-        if (Number(optCount.c) === 0) {
-            // Attached by CATEGORY so samples work whatever the dishes are named
-            await db.query(`INSERT INTO item_options (item_id, group_name, name, price_delta, choice, sort_order)
-                SELECT id, 'Extra ingredients', 'Extra Cheese', 2.50, 'multi', 1 FROM items WHERE category = 'pizzas'
-                UNION ALL SELECT id, 'Extra ingredients', 'Mushrooms', 1.50, 'multi', 2 FROM items WHERE category = 'pizzas'
-                UNION ALL SELECT id, 'Extra ingredients', 'Olives', 1.00, 'multi', 3 FROM items WHERE category = 'pizzas'
-                UNION ALL SELECT id, 'Extra ingredients', 'Extra Meat', 3.00, 'multi', 1 FROM items WHERE category = 'tacos'
-                UNION ALL SELECT id, 'Extra ingredients', 'Cheese', 1.50, 'multi', 2 FROM items WHERE category = 'tacos'
-                UNION ALL SELECT id, 'Extra ingredients', 'Guacamole', 2.00, 'multi', 3 FROM items WHERE category = 'tacos'
-                UNION ALL SELECT id, 'Size', '30cl', 0.00, 'single', 1 FROM items WHERE category = 'drinks'
-                UNION ALL SELECT id, 'Size', '1L', 2.00, 'single', 2 FROM items WHERE category = 'drinks'
-                UNION ALL SELECT id, 'Size', '2L', 4.00, 'single', 3 FROM items WHERE category = 'drinks'
-                UNION ALL SELECT id, 'Extras', 'Extra Wings', 5.00, 'multi', 1 FROM items WHERE category = 'familypack'
-                UNION ALL SELECT id, 'Extras', 'Extra Drink', 2.00, 'multi', 2 FROM items WHERE category = 'familypack'`);
-            console.log('✅ Seeded sample item options');
-        }
-        // Backfill French/Arabic names for the built-in option sets
-        const optTranslations = [
-            ['Extra Cheese', 'Fromage supplémentaire', 'جبن إضافي', 'Extra ingredients', 'Ingrédients supplémentaires', 'مكونات إضافية'],
-            ['Mushrooms', 'Champignons', 'فطر', 'Extra ingredients', 'Ingrédients supplémentaires', 'مكونات إضافية'],
-            ['Olives', 'Olives', 'زيتون', 'Extra ingredients', 'Ingrédients supplémentaires', 'مكونات إضافية'],
-            ['Extra Meat', 'Viande supplémentaire', 'لحم إضافي', 'Extra ingredients', 'Ingrédients supplémentaires', 'مكونات إضافية'],
-            ['Cheese', 'Fromage', 'جبن', 'Extra ingredients', 'Ingrédients supplémentaires', 'مكونات إضافية'],
-            ['Guacamole', 'Guacamole', 'غواكامولي', 'Extra ingredients', 'Ingrédients supplémentaires', 'مكونات إضافية'],
-            ['30cl', '30cl', '30سل', 'Size', 'Taille', 'الحجم'],
-            ['1L', '1L', '1ل', 'Size', 'Taille', 'الحجم'],
-            ['2L', '2L', '2ل', 'Size', 'Taille', 'الحجم'],
-            ['Extra Wings', 'Ailes supplémentaires', 'أجنحة إضافية', 'Extras', 'Extras', 'إضافات'],
-            ['Extra Drink', 'Boisson supplémentaire', 'مشروب إضافي', 'Extras', 'Extras', 'إضافات']
-        ];
-        for (const [en, fr, ar, g, gfr, gar] of optTranslations) {
-            await db.query(
-                `UPDATE item_options SET name_fr = ?, name_ar = ?, group_fr = ?, group_ar = ?
-                 WHERE name = ? AND name_fr IS NULL`, [fr, ar, gfr, gar, en]
-            );
-        }
-        // Reviews (item ratings, admin-moderated)
-        await db.query(`CREATE TABLE IF NOT EXISTS reviews (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            item_id INT NOT NULL,
-            rater_name VARCHAR(100) NOT NULL,
-            rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
-            comment TEXT DEFAULT NULL,
-            is_approved TINYINT(1) NOT NULL DEFAULT 0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
-        )`);
-        // Delivery zones (fees computed server-side at order time)
-        await db.query(`CREATE TABLE IF NOT EXISTS delivery_zones (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
-            name_fr VARCHAR(100) DEFAULT NULL,
-            name_ar VARCHAR(100) DEFAULT NULL,
-            fee DECIMAL(10, 2) NOT NULL DEFAULT 0,
-            free_over DECIMAL(10, 2) DEFAULT NULL,
-            eta_min INT DEFAULT NULL,
-            is_active TINYINT(1) NOT NULL DEFAULT 1,
-            sort_order INT NOT NULL DEFAULT 0
-        )`);
-        const [[zoneCount]] = await db.query('SELECT COUNT(*) AS c FROM delivery_zones');
-        if (Number(zoneCount.c) === 0) {
-            await db.query(`INSERT INTO delivery_zones (name, name_fr, name_ar, fee, free_over, eta_min, is_active, sort_order) VALUES
-                ('City Center', 'Centre-ville', 'وسط المدينة', 2.00, 30.00, 30, 1, 1),
-                ('Suburbs', 'Banlieue', 'الضواحي', 4.00, 50.00, 45, 1, 2),
-                ('Outskirts', 'Périphérie', 'الأطراف', 6.00, NULL, 60, 1, 3)`);
-            console.log('✅ Seeded delivery zones');
-        }
-        // Orders: zone + fee breakdown (nullable so old rows keep working)
-        for (const col of ['zone_id INT DEFAULT NULL', 'subtotal DECIMAL(10, 2) DEFAULT NULL', 'delivery_fee DECIMAL(10, 2) NOT NULL DEFAULT 0']) {
-            const colName = col.split(' ')[0];
-            const [has] = await db.query('SHOW COLUMNS FROM orders LIKE ?', [colName]);
-            if (has.length === 0) {
-                await db.query(`ALTER TABLE orders ADD COLUMN ${col}`);
-                console.log(`✅ Added ${colName} column to orders`);
-            }
-        }
-        // Orders: full kitchen workflow + assignment
-        await db.query(`ALTER TABLE orders MODIFY status ENUM('pending', 'confirmed', 'preparing', 'ready', 'on_way', 'delivered') NOT NULL DEFAULT 'pending'`);
-        const [assCol] = await db.query("SHOW COLUMNS FROM orders LIKE 'assigned_to'");
-        if (assCol.length === 0) {
-            await db.query('ALTER TABLE orders ADD COLUMN assigned_to INT DEFAULT NULL');
-            console.log('✅ Added assigned_to column to orders');
-        }
+    ];
+
+    for (let i = 0; i < steps.length; i++) {
         try {
-            const [fk] = await db.query(
-                `SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE
-                 WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'orders' AND COLUMN_NAME = 'assigned_to'
-                 AND REFERENCED_TABLE_NAME = 'staff'`
-            );
-            if (fk.length === 0) {
-                await db.query('ALTER TABLE orders ADD CONSTRAINT fk_orders_assigned FOREIGN KEY (assigned_to) REFERENCES staff(id) ON DELETE SET NULL');
-                console.log('✅ Added assigned_to foreign key');
-            }
-        } catch (e) {
-            console.warn('⚠️  assigned_to FK note:', e.message);
+            await steps[i]();
+        } catch (error) {
+            console.warn(`⚠️  Migration step ${i + 1} failed:`, error.message);
         }
-    } catch (error) {
-        // Non-fatal — table might not exist yet on fresh DB
-        console.warn('⚠️  Migration note:', error.message);
     }
 }
 
@@ -1171,7 +1232,11 @@ async function bootstrapAdmin() {
         if (rows.length === 0) {
             const adminUsername = (process.env.ADMIN_USERNAME || 'admin').trim();
             const adminEmail = (process.env.ADMIN_EMAIL || 'admin@delicious-restaurant.com').trim().toLowerCase();
-            const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+            const adminPassword = process.env.ADMIN_PASSWORD;
+            if (!adminPassword) {
+                console.warn('⚠️  ADMIN_PASSWORD not set — skipping admin seeding. Set it in server/.env to create the admin account.');
+                return;
+            }
             const hash = await bcrypt.hash(adminPassword, 10);
             await db.query(
                 'INSERT INTO staff (username, email, password, full_name, role) VALUES (?, ?, ?, ?, \'admin\')',

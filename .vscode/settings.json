@@ -13,7 +13,7 @@
       "name": "ayoub",
       "database": "ayoub",
       "username": "root",
-      "password": "Sara4216",
+      "password": "${env:DB_PASSWORD}",
       "connectionTimeout": 60
     }
   ]

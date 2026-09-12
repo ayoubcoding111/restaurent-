@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "anti-koshary": {
+      "source": "ismail9k/skills",
+      "sourceType": "github",
+      "skillPath": "skills/anti-koshary/SKILL.md",
+      "computedHash": "baa9cd33b7a9677642c6a17a253d52a523e310230c97190daee2dfaa283ae079"
+    }
+  }
+}

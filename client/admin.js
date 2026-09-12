@@ -153,6 +153,7 @@ const AdminDashboard = {
             if (data.success) {
                 form.reset();
                 toast('Staff account created.');
+                KitchenFlow.invalidateStaffCache();
                 this.loadStaff();
             } else {
                 showFormMsg('staffFormError', 'Failed: ' + data.message);
@@ -174,6 +175,7 @@ const AdminDashboard = {
             const data = await res.json();
             if (data.success) {
                 toast('Staff account deleted.');
+                KitchenFlow.invalidateStaffCache();
                 this.loadStaff();
             } else toast('Failed: ' + data.message, 'error');
         } catch (err) {
@@ -221,6 +223,7 @@ const AdminDashboard = {
             if (data.success) {
                 this.hideEditStaff();
                 toast('Account updated.');
+                KitchenFlow.invalidateStaffCache();
                 this.loadStaff();
             } else {
                 showFormMsg('editStaffError', 'Failed: ' + data.message);
@@ -316,16 +319,8 @@ const AdminDashboard = {
         // Build filter bar if not present
         if (!container.querySelector('.admin-orders-filters')) {
             const filterBar = document.createElement('div');
-            filterBar.className = 'admin-orders-filters dash-filters';
-            filterBar.innerHTML = `
-                <button class="filter-btn active" data-filter="all" onclick="AdminDashboard.setOrderFilter('all')">All</button>
-                <button class="filter-btn" data-filter="pending" onclick="AdminDashboard.setOrderFilter('pending')">${KitchenFlow.label('pending')}</button>
-                <button class="filter-btn" data-filter="confirmed" onclick="AdminDashboard.setOrderFilter('confirmed')">✓ ${KitchenFlow.label('confirmed')}</button>
-                <button class="filter-btn" data-filter="preparing" onclick="AdminDashboard.setOrderFilter('preparing')">${KitchenFlow.label('preparing')}</button>
-                <button class="filter-btn" data-filter="ready" onclick="AdminDashboard.setOrderFilter('ready')">${KitchenFlow.label('ready')}</button>
-                <button class="filter-btn" data-filter="on_way" onclick="AdminDashboard.setOrderFilter('on_way')">${KitchenFlow.label('on_way')}</button>
-                <button class="filter-btn" data-filter="delivered" onclick="AdminDashboard.setOrderFilter('delivered')">${KitchenFlow.label('delivered')}</button>
-            `;
+            filterBar.className = 'admin-orders-filters';
+            filterBar.innerHTML = UI.renderOrderFilterBar(this.orderFilter, 'AdminDashboard.setOrderFilter');
             container.insertBefore(filterBar, container.querySelector('.orders-list'));
         }
 
