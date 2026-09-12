@@ -1,13 +1,18 @@
 # Graph Report - Project2  (2026-09-12)
 
 ## Corpus Check
-- 35 files · ~285,874 words
+- 24 files · ~286,007 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 203 nodes · 226 edges · 20 communities (13 shown, 7 thin omitted)
+- 205 nodes · 227 edges · 20 communities (12 shown, 8 thin omitted)
 - Extraction: 90% EXTRACTED · 10% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.79)
 - Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `22823312`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - Frontend SPA & Features
@@ -46,9 +51,9 @@
 ## Surprising Connections (you probably didn't know these)
 - `Anti-Koshary Skill` --applies_to--> `Delicious Restaurant`  [INFERRED]
   .agents/skills/anti-koshary/SKILL.md → README.md
-- `Internationalization (EN/FR/AR with RTL)` --realized_by--> `Language Switcher (Globe Menu with Flags)`  [INFERRED]
-  README.md → client/index.html
 - `Customizable Menu Items (Options/Ingredients/Sizes)` --realized_by--> `Customize Item Modal`  [INFERRED]
+  README.md → client/index.html
+- `Internationalization (EN/FR/AR with RTL)` --realized_by--> `Language Switcher (Globe Menu with Flags)`  [INFERRED]
   README.md → client/index.html
 - `Live Kitchen Dashboard` --realized_by--> `Staff Dashboard Section`  [INFERRED]
   README.md → client/index.html
@@ -59,11 +64,11 @@
 - None detected.
 
 ## Hyperedges (group relationships)
-- **Pizza Menu Products** — client_imgs_3fromages_four_cheese_pizza, client_imgs_4seasons_four_seasons_pizza, client_imgs_mega_all_cheese_pizza, client_imgs_frontpic_hero_pizza_image [INFERRED 0.85]
-- **Beverage Products** — client_imgs_coca_coca_cola_can, client_imgs_sprite_sprite_can [INFERRED 0.85]
 - **Brand Identity Assets** — client_favicon_pizza_slice_svg, client_icons_icon_192_brand_logo, client_icons_icon_512_brand_logo [INFERRED 0.85]
+- **Beverage Products** — client_imgs_coca_coca_cola_can, client_imgs_sprite_sprite_can [INFERRED 0.85]
+- **Pizza Menu Products** — client_imgs_3fromages_four_cheese_pizza, client_imgs_4seasons_four_seasons_pizza, client_imgs_mega_all_cheese_pizza, client_imgs_frontpic_hero_pizza_image [INFERRED 0.85]
 
-## Communities (20 total, 7 thin omitted)
+## Communities (20 total, 8 thin omitted)
 
 ### Community 0 - "Frontend SPA & Features"
 Cohesion: 0.06
@@ -78,8 +83,8 @@ Cohesion: 0.09
 Nodes (21): API, AppState, CartBadge, CartPage, Checkout, closeConfirm(), copyPhone(), Customizer (+13 more)
 
 ### Community 3 - "NPM Dependencies"
-Cohesion: 0.10
-Nodes (19): bcryptjs, cors, dotenv, express, express-rate-limit, multer, nodemon, author (+11 more)
+Cohesion: 0.08
+Nodes (23): bcryptjs, cors, dotenv, express, express-rate-limit, multer, mysql2, nodemon (+15 more)
 
 ### Community 4 - "Code Quality Skill"
 Cohesion: 0.15
@@ -101,10 +106,6 @@ Nodes (8): Admin My Account Panel, Admin Analytics Panel with CSV Export, Admin 
 Cohesion: 0.47
 Nodes (5): nodemailer, getTransporter(), isMailConfigured(), nodemailer, sendPasswordResetEmail()
 
-### Community 9 - "Database Config"
-Cohesion: 0.40
-Nodes (4): mysql2, mysql, pool, promisePool
-
 ### Community 10 - "Dependency Audit Script"
 Cohesion: 0.83
 Nodes (3): section(), dep_audit.sh script, try()
@@ -118,21 +119,21 @@ Cohesion: 1.00
 Nodes (3): Pizza Slice SVG Favicon, Brand Logo Icon 192px, Brand Logo Icon 512px
 
 ## Knowledge Gaps
-- **115 isolated node(s):** `AdminDashboard`, `AppState`, `ScrollReveal`, `API`, `Router` (+110 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 134 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **116 isolated node(s):** `AdminDashboard`, `AppState`, `ScrollReveal`, `API`, `Router` (+111 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 136 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Delicious Restaurant` connect `Frontend SPA & Features` to `Code Quality Skill`?**
-  _High betweenness centrality (0.068) - this node is a cross-community bridge._
+  _High betweenness centrality (0.067) - this node is a cross-community bridge._
 - **Why does `SPA Entry Point (index.html)` connect `Frontend SPA & Features` to `Admin Dashboard Panels`?**
-  _High betweenness centrality (0.057) - this node is a cross-community bridge._
+  _High betweenness centrality (0.056) - this node is a cross-community bridge._
 - **Why does `Anti-Koshary Skill` connect `Code Quality Skill` to `Frontend SPA & Features`?**
-  _High betweenness centrality (0.039) - this node is a cross-community bridge._
+  _High betweenness centrality (0.038) - this node is a cross-community bridge._
 - **What connects `AdminDashboard`, `AppState`, `ScrollReveal` to the rest of the system?**
-  _115 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _116 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Frontend SPA & Features` be split into smaller, more focused modules?**
   _Cohesion score 0.0553306342780027 - nodes in this community are weakly interconnected._
 - **Should `Server Core & Auth` be split into smaller, more focused modules?**

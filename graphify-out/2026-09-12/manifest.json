@@ -14,8 +14,8 @@
   "ayoub.session.sql": {
     "mtime": 1789179720.8724802,
     "seen": 1789225710.4234414,
-    "ast_hash": "1d2c4076079f541f9b11e1d07ded22fc",
-    "semantic_hash": "1d2c4076079f541f9b11e1d07ded22fc"
+    "ast_hash": "",
+    "semantic_hash": ""
   },
   "client/admin.js": {
     "mtime": 1789221923.443154,
@@ -92,8 +92,8 @@
   "server/database.sql": {
     "mtime": 1789216174.138216,
     "seen": 1789225710.4234588,
-    "ast_hash": "26d58a62d0075e416dacd7e0b2bfb8d1",
-    "semantic_hash": "26d58a62d0075e416dacd7e0b2bfb8d1"
+    "ast_hash": "",
+    "semantic_hash": ""
   },
   "server/package.json": {
     "mtime": 1789218272.9938612,
@@ -208,5 +208,11 @@
     "seen": 1789225710.4234834,
     "ast_hash": "c6fbce4d42459c855524ba845209fa4f",
     "semantic_hash": "c6fbce4d42459c855524ba845209fa4f"
+  },
+  "CLAUDE.md": {
+    "mtime": 1789227896.2064598,
+    "seen": 1789227980.249632,
+    "ast_hash": "4a1740c507a1d64f5d2ab9bb76810b4d",
+    "semantic_hash": ""
   }
 }

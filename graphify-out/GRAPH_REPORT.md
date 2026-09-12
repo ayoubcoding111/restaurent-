@@ -1,16 +1,16 @@
 # Graph Report - Project2  (2026-09-12)
 
 ## Corpus Check
-- 24 files · ~286,007 words
+- 35 files · ~297,526 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 205 nodes · 227 edges · 20 communities (12 shown, 8 thin omitted)
-- Extraction: 90% EXTRACTED · 10% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.79)
+- 272 nodes · 283 edges · 32 communities (19 shown, 12 thin omitted)
+- Extraction: 92% EXTRACTED · 8% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.79)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `22823312`
+- Built from commit: `aa2c7020`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -35,18 +35,29 @@
 - i18n Module
 - Icons Module
 - UI Module
+- What You Must Do When Invoked
+- /graphify
+- graphify reference: extra exports and benchmark
+- graphify reference: query, path, explain
+- graphify reference: add a URL and watch a folder
+- graphify reference: commit hook and native CLAUDE.md integration
+- graphify reference: incremental update and cluster-only
+- AGENTS.md — Delicious Restaurant (Project2)
+- graphify reference: GitHub clone and cross-repo merge
+- graphify reference: transcribe video and audio
+- extraction-spec.md
 
 ## God Nodes (most connected - your core abstractions)
 1. `Delicious Restaurant` - 21 edges
 2. `SPA Entry Point (index.html)` - 18 edges
-3. `Anti-Koshary Skill` - 11 edges
-4. `Admin Dashboard Section with Sidebar Navigation` - 8 edges
-5. `Family Pack Promotion` - 7 edges
-6. `Security Checks Reference` - 5 edges
-7. `Structural Decay Reference` - 5 edges
-8. `normalizeDZPhone()` - 4 edges
-9. `isValidDZPhone()` - 4 edges
-10. `Four Cheese Pizza` - 4 edges
+3. `What You Must Do When Invoked` - 12 edges
+4. `/graphify` - 11 edges
+5. `Anti-Koshary Skill` - 11 edges
+6. `graphify reference: extra exports and benchmark` - 8 edges
+7. `Admin Dashboard Section with Sidebar Navigation` - 8 edges
+8. `Family Pack Promotion` - 7 edges
+9. `graphify reference: query, path, explain` - 5 edges
+10. `Security Checks Reference` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Anti-Koshary Skill` --applies_to--> `Delicious Restaurant`  [INFERRED]
@@ -68,7 +79,7 @@
 - **Beverage Products** — client_imgs_coca_coca_cola_can, client_imgs_sprite_sprite_can [INFERRED 0.85]
 - **Pizza Menu Products** — client_imgs_3fromages_four_cheese_pizza, client_imgs_4seasons_four_seasons_pizza, client_imgs_mega_all_cheese_pizza, client_imgs_frontpic_hero_pizza_image [INFERRED 0.85]
 
-## Communities (20 total, 8 thin omitted)
+## Communities (32 total, 12 thin omitted)
 
 ### Community 0 - "Frontend SPA & Features"
 Cohesion: 0.06
@@ -118,22 +129,50 @@ Nodes (3): KitchenAlerts, KitchenFlow, StaffDashboard
 Cohesion: 1.00
 Nodes (3): Pizza Slice SVG Favicon, Brand Logo Icon 192px, Brand Logo Icon 512px
 
+### Community 20 - "What You Must Do When Invoked"
+Cohesion: 0.13
+Nodes (15): Part A - Structural extraction for code files, Part B - Semantic extraction (parallel subagents), Part C - Merge AST + semantic into final extraction, Step 0 - GitHub repos and multi-path merge (only if a URL or several paths), Step 1 - Ensure graphify is installed, Step 2.5 - Video and audio (only if video files detected), Step 2 - Detect files, Step 3 - Extract entities and relationships (+7 more)
+
+### Community 21 - "/graphify"
+Cohesion: 0.17
+Nodes (11): For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands, PowerShell 5.1: Vertical scrolling stops working (+3 more)
+
+### Community 22 - "graphify reference: extra exports and benchmark"
+Cohesion: 0.22
+Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7a - FalkorDB export (only if --falkordb or --falkordb-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
+
+### Community 23 - "graphify reference: query, path, explain"
+Cohesion: 0.33
+Nodes (5): For /graphify explain, For /graphify path, graphify reference: query, path, explain, Step 0 — Constrained query expansion (REQUIRED before traversal), Step 1 — Traversal
+
+### Community 24 - "graphify reference: add a URL and watch a folder"
+Cohesion: 0.50
+Nodes (3): For /graphify add, For --watch, graphify reference: add a URL and watch a folder
+
+### Community 25 - "graphify reference: commit hook and native CLAUDE.md integration"
+Cohesion: 0.50
+Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify reference: commit hook and native CLAUDE.md integration
+
+### Community 26 - "graphify reference: incremental update and cluster-only"
+Cohesion: 0.50
+Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
+
 ## Knowledge Gaps
-- **116 isolated node(s):** `AdminDashboard`, `AppState`, `ScrollReveal`, `API`, `Router` (+111 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 136 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **159 isolated node(s):** `AdminDashboard`, `AppState`, `ScrollReveal`, `API`, `Router` (+154 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 191 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **12 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Delicious Restaurant` connect `Frontend SPA & Features` to `Code Quality Skill`?**
-  _High betweenness centrality (0.067) - this node is a cross-community bridge._
-- **Why does `SPA Entry Point (index.html)` connect `Frontend SPA & Features` to `Admin Dashboard Panels`?**
-  _High betweenness centrality (0.056) - this node is a cross-community bridge._
-- **Why does `Anti-Koshary Skill` connect `Code Quality Skill` to `Frontend SPA & Features`?**
   _High betweenness centrality (0.038) - this node is a cross-community bridge._
+- **Why does `SPA Entry Point (index.html)` connect `Frontend SPA & Features` to `Admin Dashboard Panels`?**
+  _High betweenness centrality (0.032) - this node is a cross-community bridge._
+- **Why does `Anti-Koshary Skill` connect `Code Quality Skill` to `Frontend SPA & Features`?**
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
 - **What connects `AdminDashboard`, `AppState`, `ScrollReveal` to the rest of the system?**
-  _116 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _159 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Frontend SPA & Features` be split into smaller, more focused modules?**
   _Cohesion score 0.0553306342780027 - nodes in this community are weakly interconnected._
 - **Should `Server Core & Auth` be split into smaller, more focused modules?**

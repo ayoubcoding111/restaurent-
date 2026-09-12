@@ -18,5 +18,17 @@
   "16": "Cart Module",
   "17": "i18n Module",
   "18": "Icons Module",
-  "19": "UI Module"
+  "19": "UI Module",
+  "20": "What You Must Do When Invoked",
+  "21": "/graphify",
+  "22": "graphify reference: extra exports and benchmark",
+  "23": "graphify reference: query, path, explain",
+  "24": "graphify reference: add a URL and watch a folder",
+  "25": "graphify reference: commit hook and native CLAUDE.md integration",
+  "26": "graphify reference: incremental update and cluster-only",
+  "27": "AGENTS.md — Delicious Restaurant (Project2)",
+  "28": "graphify reference: GitHub clone and cross-repo merge",
+  "29": "graphify reference: transcribe video and audio",
+  "30": "graphify-auto.js",
+  "31": "extraction-spec.md"
 }
