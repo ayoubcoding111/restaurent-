@@ -152,6 +152,14 @@ const KitchenFlow = {
         return this.staffCache;
     },
 
+    // Single order-list fetcher shared by both dashboards (and their pollers).
+    async fetchOrders() {
+        const res = await Auth.authFetch('/api/orders');
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+        return data.data;
+    },
+
     assignSelectHtml(order, view) {
         const list = this.staffCache || [];
         if (!list.length) {
@@ -193,6 +201,44 @@ const KitchenFlow = {
         if (!next) return '';
         const fn = view === 'admin' ? 'AdminDashboard.updateOrderStatus' : 'StaffDashboard.updateStatus';
         return `<button class="btn btn-sm ${next.cls}" onclick="${fn}(${order.id}, '${next.to}')">${Icons.check} → ${this.label(next.to)}</button>`;
+    },
+
+    // Single order-card template shared by the staff and admin dashboards.
+    // One layout to change instead of two copy-pasted renderers.
+    orderCardHtml(order, view, isNew) {
+        const items = Array.isArray(order.items) ? order.items : [];
+        const itemsList = items.map(i => {
+            const rawOpts = Array.isArray(i.options) ? i.options : [];
+            const opts = rawOpts.map(o => escAttr(I18n.pickOptName(o))).join(', ');
+            return `${escAttr(i.name)}${opts ? ` (${opts})` : ''} × ${Number(i.quantity) || 0}`;
+        }).join(', ');
+        const date = new Date(order.created_at).toLocaleString();
+        const action = view === 'admin'
+            ? AdminDashboard.renderOrderActions(order)
+            : StaffDashboard.renderStatusButton(order);
+        return `
+                <div class="order-card ${isNew ? 'order-new' : ''}">
+                    <div class="order-header">
+                        <span class="order-id">#${order.id}</span>
+                        <span class="order-date">${date}</span>
+                        <span class="status-badge status-${order.status}">${this.label(order.status)}</span>
+                        ${isNew ? '<span class="new-badge">New</span>' : ''}
+                    </div>
+                    <div class="order-body">
+                        <p><strong>Customer:</strong> ${escAttr(order.customer_name)}</p>
+                        <p><strong>Phone:</strong> <button type="button" class="phone-copy" data-phone="${escAttr(order.customer_phone)}" onclick="copyPhone(this.dataset.phone)" title="${escAttr(I18n.t('copy_phone'))}">${Icons.copy} ${escAttr(order.customer_phone)}</button></p>
+                        <p><strong>Address:</strong> ${escAttr(order.customer_address)}</p>
+                        ${order.zone_name ? `<p><strong>${I18n.t('zone_label')}:</strong> ${escAttr(order.zone_name)}</p>` : ''}
+                        <p><strong>Items:</strong> ${itemsList || 'N/A'}</p>
+                        ${order.subtotal != null && Number(order.delivery_fee) > 0 ? `<p><strong>${I18n.t('subtotal')}:</strong> $${parseFloat(order.subtotal).toFixed(2)} + <strong>${I18n.t('delivery_fee')}:</strong> $${parseFloat(order.delivery_fee).toFixed(2)}</p>` : ''}
+                        <p class="order-total"><strong>${I18n.t('cart_total')}</strong> $${parseFloat(order.total).toFixed(2)}</p>
+                        ${this.assignSelectHtml(order, view)}
+                    </div>
+                    <div class="order-actions">
+                        ${action}
+                    </div>
+                </div>
+            `;
     }
 };
 
@@ -232,12 +278,7 @@ const StaffDashboard = {
         await this.refresh(false);
         // Live polling: auto-refresh + chime on new orders
         KitchenAlerts.start('staff',
-            async () => {
-                const res = await Auth.authFetch('/api/orders');
-                const data = await res.json();
-                if (!data.success) throw new Error(data.message);
-                return data.data;
-            },
+            () => KitchenFlow.fetchOrders(),
             (orders, newIds) => {
                 this.allOrders = orders;
                 this.renderOrders(newIds);
@@ -247,11 +288,9 @@ const StaffDashboard = {
 
     async refresh(alertNew = true) {
         try {
-            const res = await Auth.authFetch('/api/orders');
-            const data = await res.json();
-            if (!data.success) throw new Error(data.message);
+            const orders = await KitchenFlow.fetchOrders();
             const prevMax = KitchenAlerts.maxSeenId['staff'] || 0;
-            this.allOrders = data.data;
+            this.allOrders = orders;
             KitchenAlerts.prime('staff', this.allOrders);
             const newIds = alertNew && prevMax > 0
                 ? this.allOrders.filter(o => o.id > prevMax).map(o => o.id)
@@ -286,39 +325,9 @@ const StaffDashboard = {
             return;
         }
 
-        list.innerHTML = orders.map(order => {
-            const items = Array.isArray(order.items) ? order.items : [];
-            const itemsList = items.map(i => {
-                const rawOpts = Array.isArray(i.options) ? i.options : [];
-                const opts = rawOpts.map(o => escAttr(I18n.pickOptName(o))).join(', ');
-                return `${escAttr(i.name)}${opts ? ` (${opts})` : ''} × ${Number(i.quantity) || 0}`;
-            }).join(', ');
-            const date = new Date(order.created_at).toLocaleString();
-
-            return `
-                <div class="order-card ${newIds.includes(order.id) ? 'order-new' : ''}">
-                    <div class="order-header">
-                        <span class="order-id">#${order.id}</span>
-                        <span class="order-date">${date}</span>
-                        <span class="status-badge status-${order.status}">${KitchenFlow.label(order.status)}</span>
-                        ${newIds.includes(order.id) ? '<span class="new-badge">New</span>' : ''}
-                    </div>
-                    <div class="order-body">
-                        <p><strong>Customer:</strong> ${escAttr(order.customer_name)}</p>
-                        <p><strong>Phone:</strong> <button type="button" class="phone-copy" data-phone="${escAttr(order.customer_phone)}" onclick="copyPhone(this.dataset.phone)" title="${escAttr(I18n.t('copy_phone'))}">${Icons.copy} ${escAttr(order.customer_phone)}</button></p>
-                        <p><strong>Address:</strong> ${escAttr(order.customer_address)}</p>
-                        ${order.zone_name ? `<p><strong>${I18n.t('zone_label')}:</strong> ${escAttr(order.zone_name)}</p>` : ''}
-                        <p><strong>Items:</strong> ${itemsList || 'N/A'}</p>
-                        ${order.subtotal != null && Number(order.delivery_fee) > 0 ? `<p><strong>${I18n.t('subtotal')}:</strong> $${parseFloat(order.subtotal).toFixed(2)} + <strong>${I18n.t('delivery_fee')}:</strong> $${parseFloat(order.delivery_fee).toFixed(2)}</p>` : ''}
-                        <p class="order-total"><strong>${I18n.t('cart_total')}</strong> $${parseFloat(order.total).toFixed(2)}</p>
-                        ${KitchenFlow.assignSelectHtml(order, 'staff')}
-                    </div>
-                    <div class="order-actions">
-                        ${this.renderStatusButton(order)}
-                    </div>
-                </div>
-            `;
-        }).join('');
+        list.innerHTML = orders.map(order =>
+            KitchenFlow.orderCardHtml(order, 'staff', newIds.includes(order.id))
+        ).join('');
     },
 
     renderStatusButton(order) {

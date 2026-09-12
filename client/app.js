@@ -585,14 +585,18 @@ const CartPage = {
 // ============================================
 // Checkout — direct order, no WhatsApp
 // ============================================
-// Algerian mobile: 05/06/07 (10 digits) or +213 5/6/7 + 8 digits.
-// Spaces/dots/dashes are ignored.
+// Algerian mobile rule lives in validators.js (shared with the server).
+// Thin wrappers keep existing call sites unchanged.
 function normalizeDZPhone(phone) {
-    return String(phone || '').replace(/[\s.\-()]/g, '');
+    return window.SharedValidators
+        ? window.SharedValidators.normalizeDZPhone(phone)
+        : String(phone || '').replace(/[\s.\-()]/g, '');
 }
 
 function isValidDZPhone(phone) {
-    return /^(\+213|0)(5|6|7)\d{8}$/.test(normalizeDZPhone(phone));
+    return window.SharedValidators
+        ? window.SharedValidators.isValidDZPhone(phone)
+        : /^(\+213|0)(5|6|7)\d{8}$/.test(normalizeDZPhone(phone));
 }
 
 function escAttr(s) {
@@ -1018,7 +1022,7 @@ function initLoginModal() {
             showFormMsg('resetError', 'Passwords do not match.');
             return;
         }
-        if (password.length < 6) {
+        if (password.length < (window.SharedValidators ? window.SharedValidators.PASSWORD_MIN : 6)) {
             showFormMsg('resetError', 'Password must be at least 6 characters.');
             return;
         }

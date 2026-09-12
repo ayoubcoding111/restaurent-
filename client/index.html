@@ -3,16 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#dc2626" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Delicious" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
     <title>Delicious Restaurant - Order Now!</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=5" />
   </head>
   <body>
     <!-- Navigation -->
     <nav class="navbar">
       <div class="container nav-container">
         <div class="logo">
-          <h1>🍕 Delicious</h1>
+          <h1><svg class="ic ic-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8V7"/><circle cx="12" cy="5.5" r="1"/><path d="M4 16a8 8 0 0 1 16 0"/><path d="M2 19.5h20"/></svg> Delicious</h1>
         </div>
         <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
           <span></span>
@@ -21,12 +28,34 @@
         </button>
         <div class="nav-overlay" id="navOverlay"></div>
         <div class="nav-links" id="navLinks">
-          <a href="#home" class="nav-link">Home</a>
-          <a href="#menu" class="nav-link">Menu</a>
-          <a href="#contact" class="nav-link">Contact</a>
+          <a href="#home" class="nav-link" data-i18n="nav_home">Home</a>
+          <a href="#menu" class="nav-link" data-i18n="nav_menu">Menu</a>
+          <a href="#contact" class="nav-link" data-i18n="nav_contact">Contact</a>
           <a href="#cart" class="nav-link cart-link" id="cartLink">
-            🛒 Cart <span class="cart-badge hidden" id="cartBadge">0</span>
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/><path d="M2 3h3l2.6 12.4a1 1 0 0 0 1 .6h8.9a1 1 0 0 0 1-.8L20.5 7H6"/></svg>
+            <span data-i18n="nav_cart">Cart</span> <span class="cart-badge hidden" id="cartBadge">0</span>
           </a>
+          <div class="lang-dropdown" id="langDropdown">
+            <button class="lang-globe-btn" id="langGlobeBtn" aria-label="Language" aria-haspopup="true">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg>
+              <span id="langCurrent">EN</span>
+              <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="lang-menu hidden" id="langMenu" role="menu">
+              <button class="lang-option" data-lang="en" role="menuitem">
+                <svg viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect x="1.25" width="0.5" height="2" fill="#CE1124"/><rect y="0.75" width="3" height="0.5" fill="#CE1124"/></svg>
+                <span>English</span>
+              </button>
+              <button class="lang-option" data-lang="fr" role="menuitem">
+                <svg viewBox="0 0 3 2" aria-hidden="true"><rect width="1" height="2" fill="#0055A4"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>
+                <span>Français</span>
+              </button>
+              <button class="lang-option" data-lang="ar" role="menuitem">
+                <svg viewBox="0 0 3 2" aria-hidden="true"><defs><mask id="dzcut"><rect width="3" height="2" fill="#fff"/><circle cx="1.66" cy="1" r="0.37" fill="#000"/></mask></defs><rect width="1.5" height="2" fill="#006233"/><rect x="1.5" width="1.5" height="2" fill="#fff"/><circle cx="1.5" cy="1" r="0.45" fill="#D21034" mask="url(#dzcut)"/><polygon points="1.74,0.88 1.765,0.955 1.845,0.955 1.78,1.005 1.805,1.08 1.74,1.03 1.675,1.08 1.7,1.005 1.635,0.955 1.715,0.955" fill="#D21034"/></svg>
+                <span>العربية</span>
+              </button>
+            </div>
+          </div>
           <label class="switch" aria-label="Toggle theme">
             <input type="checkbox" id="themeSwitch" />
             <span class="slider"></span>
@@ -39,9 +68,9 @@
     <section id="home" class="hero">
       <div class="hero-overlay"></div>
       <div class="hero-content reveal">
-        <h1 class="hero-title">Welcome to Delicious Restaurant</h1>
-        <p class="hero-subtitle">Experience the finest flavors in town</p>
-        <a href="#menu" class="btn btn-primary">View Menu</a>
+        <h1 class="hero-title" data-i18n="hero_title">Welcome to Delicious Restaurant</h1>
+        <p class="hero-subtitle" data-i18n="hero_sub">Experience the finest flavors in town</p>
+        <a href="#menu" class="btn btn-primary" data-i18n="hero_cta">View Menu</a>
       </div>
     </section>
 
@@ -50,17 +79,17 @@
       <div class="container">
         <div class="about-grid">
           <div class="about-card reveal">
-            <h3>🕐 Opening Hours</h3>
-            <p>Monday - Friday: 11:00 AM - 10:00 PM</p>
-            <p>Saturday - Sunday: 12:00 PM - 11:00 PM</p>
+            <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> <span data-i18n="hours_t">Opening Hours</span></h3>
+            <p data-i18n="hours_wd">Monday - Friday: 11:00 AM - 10:00 PM</p>
+            <p data-i18n="hours_we">Saturday - Sunday: 12:00 PM - 11:00 PM</p>
           </div>
           <div class="about-card call-to-order reveal">
-            <h3>📞 Call to Order</h3>
+            <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg> <span data-i18n="call_t">Call to Order</span></h3>
             <p class="phone-number">(555) 123-4567</p>
-            <p>Call us directly to place your order!</p>
+            <p data-i18n="call_sub">Call us directly to place your order!</p>
           </div>
           <div class="about-card reveal">
-            <h3>📍 Location</h3>
+            <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg> <span data-i18n="loc_t">Location</span></h3>
             <p>123 Food Street</p>
             <p>Flavor Town, FT 12345</p>
           </div>
@@ -71,15 +100,15 @@
     <!-- Menu Section -->
     <section id="menu" class="menu">
       <div class="container">
-        <h2 class="section-title reveal">Our Menu</h2>
+        <h2 class="section-title reveal" data-i18n="menu_title">Our Menu</h2>
         <div class="menu-controls reveal">
-          <input type="text" id="searchInput" class="search-input" placeholder="Search menu items..." />
+          <input type="text" id="searchInput" class="search-input" data-i18n-ph="search_ph" placeholder="Search menu items..." />
           <div class="filter-buttons">
-            <button class="filter-btn active" data-category="all">All</button>
-            <button class="filter-btn" data-category="pizzas">Pizzas</button>
-            <button class="filter-btn" data-category="tacos">Tacos</button>
-            <button class="filter-btn" data-category="drinks">Drinks</button>
-            <button class="filter-btn" data-category="familypack">Family Pack</button>
+            <button class="filter-btn active" data-category="all" data-i18n="f_all">All</button>
+            <button class="filter-btn" data-category="pizzas" data-i18n="f_pizzas">Pizzas</button>
+            <button class="filter-btn" data-category="tacos" data-i18n="f_tacos">Tacos</button>
+            <button class="filter-btn" data-category="drinks" data-i18n="f_drinks">Drinks</button>
+            <button class="filter-btn" data-category="familypack" data-i18n="f_family">Family Pack</button>
           </div>
         </div>
         <div id="menuGrid" class="menu-grid"></div>
@@ -92,11 +121,11 @@
     <!-- Contact Section -->
     <section id="contact" class="contact">
       <div class="container">
-        <h2 class="section-title reveal">Contact Us</h2>
+        <h2 class="section-title reveal" data-i18n="contact_title">Contact Us</h2>
         <div class="contact-info reveal">
-          <p>📧 Email: info@delicious-restaurant.com</p>
-          <p>📞 Phone: (555) 123-4567</p>
-          <p>📍 Address: 123 Food Street, Flavor Town, FT 12345</p>
+          <p><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg> Email: info@delicious-restaurant.com</p>
+          <p><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg> Phone: (555) 123-4567</p>
+          <p><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg> Address: 123 Food Street, Flavor Town, FT 12345</p>
         </div>
       </div>
     </section>
@@ -104,15 +133,16 @@
     <!-- Cart Page Section -->
     <section id="cartPage" class="page-section hidden">
       <div class="container">
-        <h2 class="section-title">My Cart</h2>
+        <h2 class="section-title" data-i18n="cart_title">My Cart</h2>
         <div id="cartItems" class="cart-items-list"></div>
         <div id="cartFooter" class="cart-footer hidden">
+          <p class="form-error hidden" id="cartError"></p>
           <div class="cart-total">
-            <span>Total:</span>
+            <span data-i18n="cart_total">Total:</span>
             <span id="cartTotal" class="menu-item-price">$0.00</span>
           </div>
-          <button class="btn btn-primary" id="cartOrderBtn">Order Now</button>
-          <button class="btn btn-secondary" id="cartClearBtn">Clear Cart</button>
+          <button class="btn btn-primary" id="cartOrderBtn" data-i18n="order_now_btn">Order Now</button>
+          <button class="btn btn-secondary" id="cartClearBtn" data-i18n="clear_cart">Clear Cart</button>
         </div>
       </div>
     </section>
@@ -121,10 +151,11 @@
     <section id="thankYouPage" class="page-section hidden">
       <div class="container">
         <div class="thank-you-card">
-          <div class="thank-you-icon">✅</div>
-          <h2 class="section-title">Order Sent!</h2>
-          <p class="thank-you-text">Your order has been sent via WhatsApp. We'll get back to you shortly!</p>
-          <a href="#menu" class="btn btn-primary">Back to Menu</a>
+          <div class="thank-you-icon"><svg class="ic ic-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5.5"/></svg></div>
+          <h2 class="section-title" data-i18n="thanks_title">Order Placed!</h2>
+          <p class="thank-you-order-id hidden" id="thankYouOrderId"></p>
+          <p class="thank-you-text" data-i18n="thanks_text">Your order has been placed. We'll call you back shortly to confirm!</p>
+          <a href="#menu" class="btn btn-primary" data-i18n="back_menu">Back to Menu</a>
         </div>
       </div>
     </section>
@@ -132,7 +163,7 @@
     <!-- Staff Dashboard Section -->
     <section id="staffDashboard" class="page-section dashboard-section hidden">
       <div class="container">
-        <h2 class="section-title">Order Management</h2>
+        <h2 class="section-title" data-i18n="staff_title">Order Management</h2>
         <div id="staffDashboardContent" class="dashboard-content"></div>
       </div>
     </section>
@@ -140,41 +171,82 @@
     <!-- Admin Dashboard Section -->
     <section id="adminDashboard" class="page-section dashboard-section hidden">
       <div class="container">
-        <h2 class="section-title">Admin Dashboard</h2>
-
-        <div class="admin-dash-tabs">
-          <button class="admin-dash-tab active" data-tab="staff">Staff</button>
-          <button class="admin-dash-tab" data-tab="orders">Orders</button>
-          <button class="admin-dash-tab" data-tab="menu">Menu Items</button>
+        <div class="admin-dash-head">
+          <button id="adminHamburger" class="admin-hamburger" aria-label="Toggle admin menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <h2 class="section-title" data-i18n="admin_title">Admin Dashboard</h2>
         </div>
+
+        <div class="admin-layout">
+          <div class="admin-overlay" id="adminOverlay"></div>
+          <aside class="admin-sidebar" id="adminSidebar">
+            <button class="admin-dash-tab active" data-tab="staff">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+              <span data-i18n="tab_staff">Staff</span>
+            </button>
+            <button class="admin-dash-tab" data-tab="orders">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
+              <span data-i18n="tab_orders">Orders</span>
+            </button>
+            <button class="admin-dash-tab" data-tab="menu">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2v7a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V2M6 2v20M20 15V2a4 4 0 0 0-4 4v7a2 2 0 0 0 2 2h2zm0 0v7"/></svg>
+              <span data-i18n="tab_menu">Menu Items</span>
+            </button>
+            <button class="admin-dash-tab" data-tab="analytics">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+              <span data-i18n="tab_analytics">Analytics</span>
+            </button>
+            <button class="admin-dash-tab" data-tab="reviews">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+              <span data-i18n="tab_reviews">Reviews</span>
+            </button>
+            <button class="admin-dash-tab" data-tab="zones">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span data-i18n="tab_zones">Zones</span>
+            </button>
+            <button class="admin-dash-tab" data-tab="account">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span data-i18n="tab_account">My Account</span>
+            </button>
+          </aside>
+
+          <div class="admin-main">
 
         <!-- Staff Panel -->
         <div id="adminPanel-staff" class="admin-dash-panel active">
           <div class="staff-form-wrap">
-            <h3>Add New Staff</h3>
+            <h3 data-i18n="add_staff_t">Add New Staff</h3>
             <form id="adminStaffForm" class="inline-form">
               <div class="form-row">
                 <div class="form-group">
-                  <label for="staffUsername">Username *</label>
+                  <label for="staffUsername" data-i18n="u_name">Username *</label>
                   <input type="text" id="staffUsername" name="username" required />
                 </div>
                 <div class="form-group">
-                  <label for="staffPassword">Password *</label>
-                  <input type="password" id="staffPassword" name="password" required />
+                  <label for="staffEmail" data-i18n="u_email">Email *</label>
+                  <input type="email" id="staffEmail" name="email" placeholder="staff@example.com" required />
                 </div>
                 <div class="form-group">
-                  <label for="staffFullName">Full Name *</label>
+                  <label for="staffPassword" data-i18n="u_pass">Password *</label>
+                  <input type="password" id="staffPassword" name="password" minlength="6" required />
+                </div>
+                <div class="form-group">
+                  <label for="staffFullName" data-i18n="u_full">Full Name *</label>
                   <input type="text" id="staffFullName" name="full_name" required />
                 </div>
                 <div class="form-group">
-                  <label for="staffRoleSelect">Role</label>
+                  <label for="staffRoleSelect" data-i18n="u_role">Role</label>
                   <select id="staffRoleSelect" name="role">
-                    <option value="staff">Staff</option>
-                    <option value="admin">Admin</option>
+                    <option value="staff" data-i18n="r_staff">Staff</option>
+                    <option value="admin" data-i18n="r_admin">Admin</option>
                   </select>
                 </div>
               </div>
-              <button type="submit" class="btn btn-primary btn-sm">Create Account</button>
+              <button type="submit" class="btn btn-primary btn-sm" data-i18n="create_acc">Create Account</button>
+              <p class="form-error hidden" id="staffFormError" style="margin-top:1rem"></p>
             </form>
           </div>
           <div class="staff-list"></div>
@@ -185,24 +257,71 @@
           <div class="orders-list"></div>
         </div>
 
+        <!-- Analytics Panel -->
+        <div id="adminPanel-analytics" class="admin-dash-panel">
+          <div class="analytics-toolbar">
+            <button class="btn btn-secondary btn-sm" onclick="AdminDashboard.exportOrdersCSV()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Export Orders CSV</button>
+          </div>
+          <div id="analyticsContent"><p class="loading-text">Loading analytics...</p></div>
+        </div>
+
+        <!-- Reviews Panel -->
+        <div id="adminPanel-reviews" class="admin-dash-panel">
+          <div class="dash-filters" id="reviewsFilters">
+            <button class="filter-btn active" data-filter="all" onclick="AdminDashboard.setReviewFilter('all')">All</button>
+            <button class="filter-btn" data-filter="pending" onclick="AdminDashboard.setReviewFilter('pending')">Pending</button>
+          </div>
+          <div id="reviewsList" class="staff-list"><p class="loading-text">Loading reviews...</p></div>
+        </div>
+
+        <!-- Zones Panel -->
+        <div id="adminPanel-zones" class="admin-dash-panel">
+          <div class="staff-form-wrap">
+            <h3 data-i18n="add_zone_t">Add Delivery Zone</h3>
+            <form id="adminZoneForm" class="inline-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="zoneName" data-i18n="z_name">Name *</label>
+                  <input type="text" id="zoneName" name="name" required />
+                </div>
+                <div class="form-group">
+                  <label for="zoneFee" data-i18n="z_fee">Fee ($) *</label>
+                  <input type="number" id="zoneFee" name="fee" step="0.01" min="0" required />
+                </div>
+                <div class="form-group">
+                  <label for="zoneFreeOver" data-i18n="z_free">Free over ($, optional)</label>
+                  <input type="number" id="zoneFreeOver" name="free_over" step="0.01" min="0" />
+                </div>
+                <div class="form-group">
+                  <label for="zoneEta" data-i18n="z_eta">ETA (min)</label>
+                  <input type="number" id="zoneEta" name="eta_min" step="1" min="0" />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm" data-i18n="add_zone_btn">Add Zone</button>
+              <p class="form-error hidden" id="zoneFormError" style="margin-top:1rem"></p>
+            </form>
+          </div>
+          <div id="zonesList" class="staff-list"></div>
+        </div>
+
         <!-- Menu Panel -->
         <div id="adminPanel-menu" class="admin-dash-panel">
           <div class="menu-form-wrap">
-            <h3>Add Menu Item</h3>
+            <h3 data-i18n="add_item_t">Add Menu Item</h3>
             <form id="adminAddItemForm" enctype="multipart/form-data" class="inline-form">
               <div class="form-row">
                 <div class="form-group">
-                  <label for="adminItemName">Name *</label>
+                  <label for="adminItemName" data-i18n="i_name">Name *</label>
                   <input type="text" id="adminItemName" name="name" required />
                 </div>
                 <div class="form-group">
-                  <label for="adminItemPrice">Price ($) *</label>
+                  <label for="adminItemPrice" data-i18n="i_price">Price ($) *</label>
                   <input type="number" id="adminItemPrice" name="price" step="0.01" min="0" required />
                 </div>
                 <div class="form-group">
-                  <label for="adminItemCategory">Category *</label>
+                  <label for="adminItemCategory" data-i18n="i_cat">Category *</label>
                   <select id="adminItemCategory" name="category" required>
-                    <option value="">Select</option>
+                    <option value="" data-i18n="i_select">Select</option>
                     <option value="pizzas">Pizzas</option>
                     <option value="tacos">Tacos</option>
                     <option value="drinks">Drinks</option>
@@ -212,22 +331,71 @@
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="adminItemDesc">Description</label>
-                  <textarea id="adminItemDesc" name="description" rows="3" placeholder="A short description of the item..."></textarea>
+                  <label for="adminItemDesc" data-i18n="i_desc">Description</label>
+                  <textarea id="adminItemDesc" name="description" rows="3" data-i18n-ph="i_desc_ph" placeholder="A short description of the item..."></textarea>
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="adminItemImage">Image *</label>
+                  <label for="adminItemImage" data-i18n="i_img">Image *</label>
                   <input type="file" id="adminItemImage" name="image" accept="image/*" required />
                   <div id="adminImagePreview" class="image-preview"></div>
                 </div>
               </div>
-              <button type="submit" class="btn btn-primary btn-sm">Add Item</button>
+              <button type="submit" class="btn btn-primary btn-sm" data-i18n="add_item_btn">Add Item</button>
+              <p class="form-error hidden" id="itemFormError" style="margin-top:1rem"></p>
             </form>
           </div>
           <div id="adminMenuList" class="admin-items-list"></div>
         </div>
+
+        <!-- My Account Panel -->
+        <div id="adminPanel-account" class="admin-dash-panel">
+          <div class="staff-form-wrap">
+            <h3 data-i18n="my_profile_t">My Profile</h3>
+            <form id="adminProfileForm" class="inline-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="profileUsername" data-i18n="u_name">Username *</label>
+                  <input type="text" id="profileUsername" name="username" required />
+                </div>
+                <div class="form-group">
+                  <label for="profileEmail" data-i18n="u_email">Email *</label>
+                  <input type="email" id="profileEmail" name="email" required />
+                </div>
+                <div class="form-group">
+                  <label for="profileFullName" data-i18n="u_full">Full Name *</label>
+                  <input type="text" id="profileFullName" name="full_name" required />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm" data-i18n="update_profile_btn">Update Profile</button>
+              <p class="form-error hidden" id="profileMsg" style="margin-top:1rem"></p>
+            </form>
+          </div>
+          <div class="staff-form-wrap">
+            <h3 data-i18n="change_pass_t">Change Password</h3>
+            <form id="adminPasswordForm" class="inline-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="currentPassword" data-i18n="cur_pass">Current Password</label>
+                  <input type="password" id="currentPassword" name="current" required />
+                </div>
+                <div class="form-group">
+                  <label for="newPassword" data-i18n="rp_new">New Password (min 6 characters)</label>
+                  <input type="password" id="newPassword" name="password" minlength="6" required />
+                </div>
+                <div class="form-group">
+                  <label for="newPasswordConfirm" data-i18n="rp_confirm">Confirm New Password</label>
+                  <input type="password" id="newPasswordConfirm" name="confirm" minlength="6" required />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm" data-i18n="rp_btn">Reset Password</button>
+              <p class="form-error hidden" id="passMsg" style="margin-top:1rem"></p>
+            </form>
+          </div>
+        </div>
+          </div><!-- /.admin-main -->
+        </div><!-- /.admin-layout -->
       </div>
     </section>
 
@@ -237,40 +405,40 @@
         <div class="footer-grid">
           <!-- Restaurant Contact -->
           <div class="footer-section reveal">
-            <h4>📬 Contact Us</h4>
+            <h4><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg> <span data-i18n="foot_contact">Contact Us</span></h4>
             <ul class="footer-contact-list">
-              <li><span class="footer-icon">📧</span> <a href="mailto:info@delicious-restaurant.com">info@delicious-restaurant.com</a></li>
-              <li><span class="footer-icon">📞</span> <a href="tel:+15551234567">(555) 123-4567</a></li>
-              <li><span class="footer-icon">📍</span> 123 Food Street, Flavor Town, FT 12345</li>
+              <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg> <a href="mailto:info@delicious-restaurant.com">info@delicious-restaurant.com</a></li>
+              <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg> <a href="tel:+15551234567">(555) 123-4567</a></li>
+              <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg> 123 Food Street, Flavor Town, FT 12345</li>
             </ul>
           </div>
 
           <!-- Quick Links -->
           <div class="footer-section reveal">
-            <h4>Quick Links</h4>
+            <h4 data-i18n="foot_links">Quick Links</h4>
             <ul class="footer-links">
-              <li><a href="#home">Home</a></li>
-              <li><a href="#menu">Menu</a></li>
-              <li><a href="#contact">Contact</a></li>
-              <li><a href="#cart">Cart</a></li>
+              <li><a href="#home" data-i18n="nav_home">Home</a></li>
+              <li><a href="#menu" data-i18n="nav_menu">Menu</a></li>
+              <li><a href="#contact" data-i18n="nav_contact">Contact</a></li>
+              <li><a href="#cart" data-i18n="nav_cart">Cart</a></li>
             </ul>
           </div>
 
           <!-- Developer Attribution -->
           <div class="footer-section reveal">
-            <h4>Developed By</h4>
+            <h4 data-i18n="foot_dev">Developed By</h4>
             <p class="dev-name">Omar Ayoub Benkreira</p>
             <ul class="footer-contact-list">
               <li>
-                <span class="footer-icon">📧</span>
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg>
                 <a href="mailto:ayoubecom111@gmail.com">ayoubecom111@gmail.com</a>
               </li>
               <li>
-                <span class="footer-icon">💼</span>
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                 <a href="https://www.linkedin.com/in/omar-ayoub-benkreira/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
               </li>
               <li>
-                <span class="footer-icon">🐙</span>
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.4 6.4-1.5 6.4-7A5.4 5.4 0 0 0 20 4.8 5.1 5.1 0 0 0 19.9 1S18.7.6 16 2.5a13.4 13.4 0 0 0-7 0C6.3.6 5.1 1 5.1 1A5.1 5.1 0 0 0 5 4.8a5.4 5.4 0 0 0-1.5 3.8c0 5.4 3.3 6.6 6.4 7a3.4 3.4 0 0 0-.9 2.6V22"/></svg>
                 <a href="https://github.com/ayoubcoding111" target="_blank" rel="noopener noreferrer">GitHub</a>
               </li>
             </ul>
@@ -279,32 +447,64 @@
 
         <!-- Bottom bar: copyright + auth -->
         <div class="footer-bottom">
-          <p>&copy; 2026 Delicious Restaurant. All rights reserved.</p>
+          <p>&copy; 2026 Delicious Restaurant. <span data-i18n="rights">All rights reserved.</span></p>
           <div id="footerAuth" class="footer-auth"></div>
         </div>
       </div>
     </footer>
 
+    <!-- Customize Item Modal -->
+    <div id="customizeModal" class="modal">
+      <div class="modal-content">
+        <span class="close-customize"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
+        <img id="custImage" class="cust-image" alt="" />
+        <h2 id="custName"></h2>
+        <p id="custDesc" class="menu-item-desc"></p>
+        <div id="custGroups"></div>
+        <div id="custReviews" class="cust-reviews"></div>
+        <div class="cust-footer">
+          <span id="custTotal" class="menu-item-price">$0.00</span>
+          <div style="display:flex;gap:0.5rem">
+            <button class="btn btn-secondary" id="custOrderBtn" style="display:none">
+              <span data-i18n="order_now">Order Now</span>
+            </button>
+            <button class="btn btn-primary" id="custAddBtn">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/><path d="M2 3h3l2.6 12.4a1 1 0 0 0 1 .6h8.9a1 1 0 0 0 1-.8L20.5 7H6"/></svg>
+            <span data-i18n="add_cart">Add to Cart</span>
+          </button>
+        </div>
+      </div>
+      </div>
+    </div>
+
     <!-- Checkout Modal -->
     <div id="checkoutModal" class="modal">
       <div class="modal-content">
-        <span class="close-checkout">&times;</span>
-        <h2>Complete Your Order</h2>
-        <p class="checkout-subtitle">Fill in your details to send the order via WhatsApp.</p>
+        <span class="close-checkout"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
+        <h2 data-i18n="co_title">Complete Your Order</h2>
+        <p class="checkout-subtitle" data-i18n="co_sub">Fill in your details to place your order.</p>
         <form id="checkoutForm">
           <div class="form-group">
-            <label for="customerName">Full Name *</label>
+            <label for="customerName" data-i18n="co_name">Full Name *</label>
             <input type="text" id="customerName" name="name" placeholder="e.g. Ahmed Benali" required />
           </div>
           <div class="form-group">
-            <label for="customerPhone">Mobile Number *</label>
-            <input type="tel" id="customerPhone" name="phone" placeholder="e.g. 0555 12 34 56" required />
+            <label for="customerPhone" data-i18n="co_phone">Mobile Number *</label>
+            <input type="tel" id="customerPhone" name="phone" placeholder="e.g. 0555 12 34 56" required inputmode="tel" autocomplete="tel" />
+            <small class="form-hint" data-i18n="co_phone_hint">Algerian mobile: 05 / 06 / 07 or +213…</small>
           </div>
           <div class="form-group">
-            <label for="customerAddress">Address *</label>
+            <label for="customerAddress" data-i18n="co_addr">Address *</label>
             <input type="text" id="customerAddress" name="address" placeholder="e.g. 123 Rue Didouche Mourad, Alger" required />
           </div>
-          <button type="submit" class="btn btn-primary" id="checkoutSubmitBtn">Send Order via WhatsApp</button>
+          <div class="form-group">
+            <label for="zoneSelect" data-i18n="zone_label">Delivery zone</label>
+            <select id="zoneSelect" name="zone"></select>
+            <small class="form-hint" id="zoneFeeHint"></small>
+          </div>
+          <p class="form-error hidden" id="checkoutError"></p>
+          <p class="cart-total checkout-total"><span data-i18n="cart_total">Total:</span> <span id="checkoutTotal" class="menu-item-price">$0.00</span></p>
+          <button type="submit" class="btn btn-primary" id="checkoutSubmitBtn" data-i18n="co_btn">Place Order</button>
         </form>
       </div>
     </div>
@@ -312,26 +512,177 @@
     <!-- Login Modal -->
     <div id="loginModal" class="modal">
       <div class="modal-content">
-        <span class="close-login">&times;</span>
-        <h2>Staff / Admin Login</h2>
+        <span class="close-login"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
+        <h2 data-i18n="login_title">Staff / Admin Login</h2>
         <form id="loginForm">
           <div class="form-group">
-            <label for="loginUsername">Username</label>
-            <input type="text" id="loginUsername" name="username" required />
+            <label for="loginUsername" data-i18n="login_user">Username or Email</label>
+            <input type="text" id="loginUsername" name="username" data-i18n-ph="login_user_ph" placeholder="e.g. admin or you@example.com" required />
           </div>
           <div class="form-group">
-            <label for="loginPassword">Password</label>
+            <label for="loginPassword" data-i18n="login_pass">Password</label>
             <input type="password" id="loginPassword" name="password" required />
           </div>
-          <button type="submit" class="btn btn-primary">Login</button>
+          <p class="form-error hidden" id="loginError"></p>
+          <button type="submit" class="btn btn-primary" data-i18n="login_btn">Login</button>
+          <p class="auth-link-wrap">
+            <a href="#" id="forgotPasswordLink" class="auth-link" data-i18n="forgot_link">Forgot password?</a>
+          </p>
         </form>
       </div>
     </div>
 
+    <!-- Forgot Password Modal -->
+    <div id="forgotModal" class="modal">
+      <div class="modal-content">
+        <span class="close-forgot"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
+        <h2 data-i18n="fp_title">Reset Password</h2>
+        <p class="checkout-subtitle" data-i18n="fp_sub">Enter your account email or username and we'll send you a reset link.</p>
+        <form id="forgotForm">
+          <div class="form-group">
+            <label for="forgotEmail" data-i18n="fp_field">Email or Username</label>
+            <input type="text" id="forgotEmail" name="email" placeholder="you@example.com" required />
+          </div>
+          <p class="form-error hidden" id="forgotError"></p>
+          <p class="form-success hidden" id="forgotSuccess"></p>
+          <button type="submit" class="btn btn-primary" data-i18n="fp_btn">Send Reset Link</button>
+          <p class="auth-link-wrap">
+            <a href="#" id="backToLoginLink" class="auth-link" data-i18n="back_login">← Back to login</a>
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Confirm Dialog -->
+    <div id="confirmModal" class="modal">
+      <div class="modal-content">
+        <h2 data-i18n="confirm_title">Please confirm</h2>
+        <p class="checkout-subtitle" id="confirmMsg"></p>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="confirmNoBtn" data-i18n="cancel_btn">Cancel</button>
+          <button class="btn btn-delete" id="confirmYesBtn" data-i18n="delete_btn">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Menu Item Modal -->
+    <div id="editItemModal" class="modal">
+      <div class="modal-content modal-large">
+        <span class="close-edit-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
+        <h2 data-i18n="edit_item_t">Edit Menu Item</h2>
+        <form id="editItemForm">
+          <input type="hidden" id="editItemId" />
+          <div class="form-row">
+            <div class="form-group">
+              <label for="editItemName" data-i18n="i_name">Name *</label>
+              <input type="text" id="editItemName" name="name" required />
+            </div>
+            <div class="form-group">
+              <label for="editItemPrice" data-i18n="i_price">Price ($) *</label>
+              <input type="number" id="editItemPrice" name="price" step="0.01" min="0" required />
+            </div>
+            <div class="form-group">
+              <label for="editItemCategory" data-i18n="i_cat">Category *</label>
+              <select id="editItemCategory" name="category" required>
+                <option value="pizzas">Pizzas</option>
+                <option value="tacos">Tacos</option>
+                <option value="drinks">Drinks</option>
+                <option value="familypack">Family Pack</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="editItemDesc" data-i18n="i_desc">Description</label>
+            <textarea id="editItemDesc" name="description" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="editItemImage" data-i18n="change_image">Change image (optional)</label>
+            <input type="file" id="editItemImage" name="image" accept="image/*" />
+          </div>
+          <h3 class="opts-title" data-i18n="opts_t">Customization options</h3>
+          <p class="checkout-subtitle" data-i18n="opts_hint">Group options (e.g. “Extra ingredients”, “Size”). “Single” = customer picks one (sizes), “Multiple” = can pick several (ingredients). Each adds its price.</p>
+          <div id="editOptionsList" class="opts-list"></div>
+          <button type="button" class="btn btn-secondary btn-sm" id="addOptionBtn" data-i18n="add_option">+ Add option</button>
+          <p class="form-error hidden" id="editItemError" style="margin-top:1rem"></p>
+          <div style="margin-top:1rem">
+            <button type="submit" class="btn btn-primary" data-i18n="save_btn">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Staff Modal -->
+    <div id="editStaffModal" class="modal">
+      <div class="modal-content">
+        <span class="close-edit-staff"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
+        <h2 data-i18n="edit_staff_t">Edit Staff Account</h2>
+        <form id="editStaffForm">
+          <input type="hidden" id="editStaffId" />
+          <div class="form-group">
+            <label for="editStaffUsername" data-i18n="u_name">Username *</label>
+            <input type="text" id="editStaffUsername" name="username" required />
+          </div>
+          <div class="form-group">
+            <label for="editStaffEmail" data-i18n="u_email">Email *</label>
+            <input type="email" id="editStaffEmail" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="editStaffFullName" data-i18n="u_full">Full Name *</label>
+            <input type="text" id="editStaffFullName" name="full_name" required />
+          </div>
+          <div class="form-group">
+            <label for="editStaffRole" data-i18n="u_role">Role</label>
+            <select id="editStaffRole" name="role">
+              <option value="staff" data-i18n="r_staff">Staff</option>
+              <option value="admin" data-i18n="r_admin">Admin</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editStaffPassword" data-i18n="new_pass_opt">New Password (leave blank to keep)</label>
+            <input type="password" id="editStaffPassword" name="password" minlength="6" placeholder="••••••" />
+          </div>
+          <button type="submit" class="btn btn-primary" data-i18n="save_btn">Save Changes</button>
+          <p class="form-error hidden" id="editStaffError" style="margin-top:1rem"></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Set New Password Modal -->
+    <div id="resetModal" class="modal">
+      <div class="modal-content">
+        <span class="close-reset"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
+        <h2 data-i18n="rp_title">Choose a New Password</h2>
+        <form id="resetForm">
+          <div class="form-group">
+            <label for="resetPassword" data-i18n="rp_new">New Password (min 6 characters)</label>
+            <input type="password" id="resetPassword" name="password" minlength="6" required />
+          </div>
+          <div class="form-group">
+            <label for="resetPasswordConfirm" data-i18n="rp_confirm">Confirm New Password</label>
+            <input type="password" id="resetPasswordConfirm" name="confirm" minlength="6" required />
+          </div>
+          <p class="form-error hidden" id="resetError"></p>
+          <p class="form-success hidden" id="resetSuccess"></p>
+          <button type="submit" class="btn btn-primary" data-i18n="rp_btn">Reset Password</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="i18n.js"></script>
+    <script src="icons.js"></script>
+    <script src="validators.js"></script>
     <script src="cart.js"></script>
     <script src="auth.js"></script>
     <script src="staff.js"></script>
-    <script src="admin.js"></script>
-    <script src="app.js"></script>
+    <script src="admin.js?v=5"></script>
+    <script src="app.js?v=5"></script>
+    <script>
+      // PWA: register service worker (offline menu). Silent if unsupported.
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>

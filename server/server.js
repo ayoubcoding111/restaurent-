@@ -9,6 +9,9 @@ const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
 const db = require('./config/db');
 const { sendPasswordResetEmail, isMailConfigured } = require('./config/mailer');
+// Single source of truth for validation rules (also loaded by the browser).
+// Changing a rule in client/validators.js changes it on both sides.
+const { PASSWORD_MIN, normalizeDZPhone, isValidDZPhone, isValidEmail } = require('../client/validators');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -120,24 +123,18 @@ function requireAdmin(req, res, next) {
     });
 }
 
+// Drop all sessions of a user (e.g. after a password change).
+// keepToken: one session to spare (the one that made the change).
+function invalidateUserSessions(userId, keepToken) {
+    for (const [t, s] of sessions) {
+        if (s.userId === userId && t !== keepToken) sessions.delete(t);
+    }
+}
+
 // ============================================
 // Auth Routes
 // ============================================
-function isValidEmail(email) {
-    return typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-}
-
-// Algerian mobile: 05 / 06 / 07 (10 digits) or +213 5/6/7 + 8 digits.
-// Spaces, dots and dashes are ignored: "0555 12 34 56" is accepted.
-function normalizeDZPhone(phone) {
-    if (typeof phone !== 'string') return '';
-    return phone.replace(/[\s.\-()]/g, '');
-}
-
-function isValidDZPhone(phone) {
-    const cleaned = normalizeDZPhone(phone);
-    return /^(\+213|0)(5|6|7)\d{8}$/.test(cleaned);
-}
+// (Validation helpers come from client/validators.js — see top of file.)
 
 // Login accepts username OR email (field: "username" kept for backward
 // compat, or "identifier"/"email"). Returns token + role on success.
@@ -225,8 +222,8 @@ app.post('/api/auth/reset-password', authLimiter, async (req, res) => {
         if (!token || !password) {
             return res.status(400).json({ success: false, message: 'Token and new password are required' });
         }
-        if (password.length < 6) {
-            return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+        if (password.length < PASSWORD_MIN) {
+            return res.status(400).json({ success: false, message: 'Password must be at least ' + PASSWORD_MIN + ' characters' });
         }
         const [rows] = await db.query('SELECT id, reset_expires FROM staff WHERE reset_token = ?', [token]);
         if (rows.length === 0) {
@@ -239,9 +236,7 @@ app.post('/api/auth/reset-password', authLimiter, async (req, res) => {
         const hash = await bcrypt.hash(password, 10);
         await db.query('UPDATE staff SET password = ?, reset_token = NULL, reset_expires = NULL WHERE id = ?', [hash, user.id]);
         // Invalidate any active sessions for this user
-        for (const [t, s] of sessions) {
-            if (s.userId === user.id) sessions.delete(t);
-        }
+        invalidateUserSessions(user.id);
         res.json({ success: true, message: 'Password has been reset. You can now log in.' });
     } catch (error) {
         console.error('Reset-password error:', error);
@@ -292,8 +287,8 @@ app.post('/api/staff', requireAdmin, async (req, res) => {
         if (!isValidEmail(email)) {
             return res.status(400).json({ success: false, message: 'A valid email address is required' });
         }
-        if (password.length < 6) {
-            return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+        if (password.length < PASSWORD_MIN) {
+            return res.status(400).json({ success: false, message: 'Password must be at least ' + PASSWORD_MIN + ' characters' });
         }
         const hash = await bcrypt.hash(password, 10);
         const staffRole = role === 'admin' ? 'admin' : 'staff';
@@ -348,8 +343,8 @@ app.patch('/api/staff/:id', requireAdmin, async (req, res) => {
         const fields = ['username = ?', 'email = ?', 'full_name = ?', 'role = ?'];
         const values = [username.trim(), email.trim().toLowerCase(), full_name.trim(), staffRole];
         if (password) {
-            if (password.length < 6) {
-                return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+            if (password.length < PASSWORD_MIN) {
+                return res.status(400).json({ success: false, message: 'Password must be at least ' + PASSWORD_MIN + ' characters' });
             }
             fields.push('password = ?');
             values.push(await bcrypt.hash(password, 10));
@@ -358,9 +353,7 @@ app.patch('/api/staff/:id', requireAdmin, async (req, res) => {
         await db.query(`UPDATE staff SET ${fields.join(', ')} WHERE id = ?`, values);
         if (password) {
             // New credentials → drop that user's sessions (they must log in again)
-            for (const [t, s] of sessions) {
-                if (s.userId === id) sessions.delete(t);
-            }
+            invalidateUserSessions(id);
         }
         const [[updated]] = await db.query('SELECT id, username, email, full_name, role, created_at FROM staff WHERE id = ?', [id]);
         res.json({ success: true, message: 'Account updated', data: updated });
@@ -410,8 +403,8 @@ app.post('/api/auth/change-password', authenticateToken, async (req, res) => {
         if (!currentPassword || !newPassword) {
             return res.status(400).json({ success: false, message: 'Current and new password are required' });
         }
-        if (newPassword.length < 6) {
-            return res.status(400).json({ success: false, message: 'New password must be at least 6 characters' });
+        if (newPassword.length < PASSWORD_MIN) {
+            return res.status(400).json({ success: false, message: 'New password must be at least ' + PASSWORD_MIN + ' characters' });
         }
         const [[row]] = await db.query('SELECT password FROM staff WHERE id = ?', [req.user.userId]);
         if (!row || !(await bcrypt.compare(currentPassword, row.password))) {
@@ -420,9 +413,7 @@ app.post('/api/auth/change-password', authenticateToken, async (req, res) => {
         await db.query('UPDATE staff SET password = ? WHERE id = ?', [await bcrypt.hash(newPassword, 10), req.user.userId]);
         // Keep this session, drop any others (e.g. other devices)
         const currentToken = req.headers.authorization.split(' ')[1];
-        for (const [t, s] of sessions) {
-            if (s.userId === req.user.userId && t !== currentToken) sessions.delete(t);
-        }
+        invalidateUserSessions(req.user.userId, currentToken);
         res.json({ success: true, message: 'Password changed' });
     } catch (error) {
         console.error('Error changing password:', error);
