@@ -1,0 +1,212 @@
+{
+  ".agents/skills/anti-koshary/scripts/dep_audit.sh": {
+    "mtime": 1789188761.79399,
+    "seen": 1789225710.423432,
+    "ast_hash": "6bfd1602991d45cae8002da703065c0b",
+    "semantic_hash": "6bfd1602991d45cae8002da703065c0b"
+  },
+  ".vscode/settings.json": {
+    "mtime": 1789220944.4344304,
+    "seen": 1789225710.4234388,
+    "ast_hash": "033ecd432b7aff55e7503f9bcb564ecd",
+    "semantic_hash": "033ecd432b7aff55e7503f9bcb564ecd"
+  },
+  "ayoub.session.sql": {
+    "mtime": 1789179720.8724802,
+    "seen": 1789225710.4234414,
+    "ast_hash": "1d2c4076079f541f9b11e1d07ded22fc",
+    "semantic_hash": "1d2c4076079f541f9b11e1d07ded22fc"
+  },
+  "client/admin.js": {
+    "mtime": 1789221923.443154,
+    "seen": 1789225710.4234428,
+    "ast_hash": "67d8c1dd436c9d8c1c9616cf690df6d1",
+    "semantic_hash": "67d8c1dd436c9d8c1c9616cf690df6d1"
+  },
+  "client/app.js": {
+    "mtime": 1789219771.8797932,
+    "seen": 1789225710.4234445,
+    "ast_hash": "cacee7db7d8a58c115d5eec1f1bc61c7",
+    "semantic_hash": "cacee7db7d8a58c115d5eec1f1bc61c7"
+  },
+  "client/auth.js": {
+    "mtime": 1789221511.3152103,
+    "seen": 1789225710.423446,
+    "ast_hash": "ecb945c44efaaf6d635ac70a19a4ffc6",
+    "semantic_hash": "ecb945c44efaaf6d635ac70a19a4ffc6"
+  },
+  "client/cart.js": {
+    "mtime": 1789179709.1675508,
+    "seen": 1789225710.4234474,
+    "ast_hash": "cb5bd6019b276d0f80037bc982f023c9",
+    "semantic_hash": "cb5bd6019b276d0f80037bc982f023c9"
+  },
+  "client/i18n.js": {
+    "mtime": 1789183939.3111737,
+    "seen": 1789225710.4234486,
+    "ast_hash": "a60e01677aa41f184e2d50f3afe05de8",
+    "semantic_hash": "a60e01677aa41f184e2d50f3afe05de8"
+  },
+  "client/icons.js": {
+    "mtime": 1789219771.6891463,
+    "seen": 1789225710.4234498,
+    "ast_hash": "a0d21e9093d5fa17d2b5e6d6ba8eb644",
+    "semantic_hash": "a0d21e9093d5fa17d2b5e6d6ba8eb644"
+  },
+  "client/staff.js": {
+    "mtime": 1789221313.6195335,
+    "seen": 1789225710.4234512,
+    "ast_hash": "12b12d86dd8e83e1b075ad57bdf71f42",
+    "semantic_hash": "12b12d86dd8e83e1b075ad57bdf71f42"
+  },
+  "client/sw.js": {
+    "mtime": 1789221338.00658,
+    "seen": 1789225710.4234524,
+    "ast_hash": "b4ed01904c74e505ed523bb1945dfa18",
+    "semantic_hash": "b4ed01904c74e505ed523bb1945dfa18"
+  },
+  "client/ui.js": {
+    "mtime": 1789221297.9861188,
+    "seen": 1789225710.423454,
+    "ast_hash": "56735623cb642540f877cebd8d1a8d58",
+    "semantic_hash": "56735623cb642540f877cebd8d1a8d58"
+  },
+  "client/validators.js": {
+    "mtime": 1789187717.898463,
+    "seen": 1789225710.423455,
+    "ast_hash": "e2370f7a3a348b3848cbed2793072477",
+    "semantic_hash": "e2370f7a3a348b3848cbed2793072477"
+  },
+  "server/config/db.js": {
+    "mtime": 1789171883.4290702,
+    "seen": 1789225710.4234562,
+    "ast_hash": "9a8b683dbf9d72bfbe8cc7dcdcc747c4",
+    "semantic_hash": "9a8b683dbf9d72bfbe8cc7dcdcc747c4"
+  },
+  "server/config/mailer.js": {
+    "mtime": 1789216698.645003,
+    "seen": 1789225710.4234576,
+    "ast_hash": "7972b379091e5193309cd297b48742c8",
+    "semantic_hash": "7972b379091e5193309cd297b48742c8"
+  },
+  "server/database.sql": {
+    "mtime": 1789216174.138216,
+    "seen": 1789225710.4234588,
+    "ast_hash": "26d58a62d0075e416dacd7e0b2bfb8d1",
+    "semantic_hash": "26d58a62d0075e416dacd7e0b2bfb8d1"
+  },
+  "server/package.json": {
+    "mtime": 1789218272.9938612,
+    "seen": 1789225710.4234598,
+    "ast_hash": "c7a0f1f91bd0d0fc6505b84ec30fdad6",
+    "semantic_hash": "c7a0f1f91bd0d0fc6505b84ec30fdad6"
+  },
+  "server/server.js": {
+    "mtime": 1789221431.5735283,
+    "seen": 1789225710.4234612,
+    "ast_hash": "e416d15b7d5565a4386d78ec6082317b",
+    "semantic_hash": "e416d15b7d5565a4386d78ec6082317b"
+  },
+  "skills-lock.json": {
+    "mtime": 1789188762.4360857,
+    "seen": 1789225710.4234624,
+    "ast_hash": "23dd0891756bd67354738f1ebc791248",
+    "semantic_hash": "23dd0891756bd67354738f1ebc791248"
+  },
+  ".agents/skills/anti-koshary/SKILL.md": {
+    "mtime": 1789188761.79399,
+    "seen": 1789225710.4234636,
+    "ast_hash": "8801bacc8b9519ee6fb1badba3f72570",
+    "semantic_hash": "8801bacc8b9519ee6fb1badba3f72570"
+  },
+  ".agents/skills/anti-koshary/references/security-checks.md": {
+    "mtime": 1789188761.79399,
+    "seen": 1789225710.4234648,
+    "ast_hash": "734efbd3b0b67968b28eb43b02b10a52",
+    "semantic_hash": "734efbd3b0b67968b28eb43b02b10a52"
+  },
+  ".agents/skills/anti-koshary/references/structural-decay.md": {
+    "mtime": 1789188761.79399,
+    "seen": 1789225710.423466,
+    "ast_hash": "4fab1f9fbb0f2fd26e3a2cf7aa302213",
+    "semantic_hash": "4fab1f9fbb0f2fd26e3a2cf7aa302213"
+  },
+  "README.md": {
+    "mtime": 1789185222.7890942,
+    "seen": 1789225710.4234679,
+    "ast_hash": "709d27384d4dad163a03b0ab07eb59bf",
+    "semantic_hash": "709d27384d4dad163a03b0ab07eb59bf"
+  },
+  "client/index.html": {
+    "mtime": 1789221307.5125773,
+    "seen": 1789225710.423469,
+    "ast_hash": "3294b1c1d071f170fe948220699dd0a9",
+    "semantic_hash": "3294b1c1d071f170fe948220699dd0a9"
+  },
+  "client/favicon.svg": {
+    "mtime": 1789083230.5997741,
+    "seen": 1789225710.4234703,
+    "ast_hash": "d4060f6e53133be5d2bd6a1dc9ab5746",
+    "semantic_hash": "d4060f6e53133be5d2bd6a1dc9ab5746"
+  },
+  "client/icons/icon-192.png": {
+    "mtime": 1789182094.8654625,
+    "seen": 1789225710.4234717,
+    "ast_hash": "9d0536b5b8b97441f1743c67e9077422",
+    "semantic_hash": "9d0536b5b8b97441f1743c67e9077422"
+  },
+  "client/icons/icon-512.png": {
+    "mtime": 1789182094.8843484,
+    "seen": 1789225710.423473,
+    "ast_hash": "362a4a3283fa26b344d6bd74895c802e",
+    "semantic_hash": "362a4a3283fa26b344d6bd74895c802e"
+  },
+  "client/imgs/3fromages.jpg": {
+    "mtime": 1789049440.373508,
+    "seen": 1789225710.4234738,
+    "ast_hash": "e2cb33daaf866e49e144267e10b355f1",
+    "semantic_hash": "e2cb33daaf866e49e144267e10b355f1"
+  },
+  "client/imgs/4seasons.jpg": {
+    "mtime": 1789049552.2145202,
+    "seen": 1789225710.4234753,
+    "ast_hash": "a5f3ca31da603c755eb96d00dcbc9fcd",
+    "semantic_hash": "a5f3ca31da603c755eb96d00dcbc9fcd"
+  },
+  "client/imgs/coca.jpg": {
+    "mtime": 1789057825.794107,
+    "seen": 1789225710.4234765,
+    "ast_hash": "42d27985e9ad14d3812d4bfaa5d5f9b5",
+    "semantic_hash": "42d27985e9ad14d3812d4bfaa5d5f9b5"
+  },
+  "client/imgs/familypack.jpg": {
+    "mtime": 1789058486.7018318,
+    "seen": 1789225710.4234784,
+    "ast_hash": "2619cf1eeec35f0ad19748f73c6ddb97",
+    "semantic_hash": "2619cf1eeec35f0ad19748f73c6ddb97"
+  },
+  "client/imgs/frontpic.jpg": {
+    "mtime": 1789057369.582586,
+    "seen": 1789225710.4234798,
+    "ast_hash": "6c0bce27fe435cd7988889e003c15f38",
+    "semantic_hash": "6c0bce27fe435cd7988889e003c15f38"
+  },
+  "client/imgs/mega.jpg": {
+    "mtime": 1789049594.6342144,
+    "seen": 1789225710.4234807,
+    "ast_hash": "63a7b3457a81253c3667fbd0d96c5b68",
+    "semantic_hash": "63a7b3457a81253c3667fbd0d96c5b68"
+  },
+  "client/imgs/sprite.jpg": {
+    "mtime": 1789057917.787473,
+    "seen": 1789225710.4234822,
+    "ast_hash": "4d5422330fe0729cf89dcd7fb0a589d1",
+    "semantic_hash": "4d5422330fe0729cf89dcd7fb0a589d1"
+  },
+  "client/imgs/tacos.jpg": {
+    "mtime": 1789058405.727479,
+    "seen": 1789225710.4234834,
+    "ast_hash": "c6fbce4d42459c855524ba845209fa4f",
+    "semantic_hash": "c6fbce4d42459c855524ba845209fa4f"
+  }
+}
