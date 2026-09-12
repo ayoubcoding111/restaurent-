@@ -60,10 +60,10 @@
     "semantic_hash": "12b12d86dd8e83e1b075ad57bdf71f42"
   },
   "client/sw.js": {
-    "mtime": 1789221338.00658,
-    "seen": 1789225710.4234524,
-    "ast_hash": "b4ed01904c74e505ed523bb1945dfa18",
-    "semantic_hash": "b4ed01904c74e505ed523bb1945dfa18"
+    "mtime": 1789255928.0324352,
+    "seen": 1789255932.2913053,
+    "ast_hash": "fedc63b3728bb3c9a633d7652a6a47a1",
+    "semantic_hash": ""
   },
   "client/ui.js": {
     "mtime": 1789221297.9861188,
@@ -138,9 +138,9 @@
     "semantic_hash": "709d27384d4dad163a03b0ab07eb59bf"
   },
   "client/index.html": {
-    "mtime": 1789254943.909376,
-    "seen": 1789254947.7393246,
-    "ast_hash": "0d02f68cc5c8c5a20b961f50ff0c77d8",
+    "mtime": 1789255953.935616,
+    "seen": 1789255957.811453,
+    "ast_hash": "99ed6142930a0a313f0f184c8ece9081",
     "semantic_hash": ""
   },
   "client/favicon.svg": {
