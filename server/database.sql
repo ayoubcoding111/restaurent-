@@ -106,7 +106,29 @@ CREATE TABLE IF NOT EXISTS orders (
     assigned_to INT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (assigned_to) REFERENCES staff(id) ON DELETE SET NULL
+    FOREIGN KEY (assigned_to) REFERENCES staff(id) ON DELETE SET NULL,
+    INDEX idx_orders_phone (customer_phone)
+);
+
+-- ============================================
+-- Auth hardening (login audit + IP bans)
+-- Survives restarts; also created by migrateDB() on old DBs
+-- ============================================
+CREATE TABLE IF NOT EXISTS auth_audit (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    identifier VARCHAR(255) NOT NULL,
+    ip VARCHAR(45) NOT NULL,
+    success TINYINT(1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_audit_ident (identifier, created_at),
+    INDEX idx_audit_ip (ip, created_at)
+);
+
+CREATE TABLE IF NOT EXISTS ip_bans (
+    ip VARCHAR(45) PRIMARY KEY,
+    banned_until DATETIME NOT NULL,
+    fail_count INT NOT NULL DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- ============================================

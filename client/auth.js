@@ -24,12 +24,13 @@ const Auth = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ identifier, username: identifier, password })
         });
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
         if (data.success) {
             // Token is set as an httpOnly cookie by the server — do not store in localStorage.
             localStorage.setItem(this.ROLE_KEY, data.role);
             localStorage.setItem(this.NAME_KEY, data.full_name || data.username);
         }
+        data._status = res.status;
         return data;
     },
 

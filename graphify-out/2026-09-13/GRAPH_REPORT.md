@@ -1,7 +1,7 @@
 # Graph Report - Project2  (2026-09-13)
 
 ## Corpus Check
-- 36 files · ~299,960 words
+- 36 files · ~299,953 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -28,7 +28,7 @@
 - Dependency Audit Script
 - Staff Dashboard
 - Brand Assets
-- sw.js
+- Service Worker & PWA
 - Admin Module
 - Auth Module
 - Cart Module

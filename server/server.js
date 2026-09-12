@@ -15,6 +15,9 @@ const { PASSWORD_MIN, normalizeDZPhone, isValidDZPhone, isValidEmail } = require
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+// Trust first proxy (production reverse proxy / PaaS) so req.ip reflects the
+// real client IP for rate limiting and IP bans. Safe with a single proxy hop.
+app.set('trust proxy', 1);
 const clientDir = path.join(__dirname, '..', 'client');
 const uploadsDir = path.join(__dirname, 'uploads');
 
@@ -54,10 +57,10 @@ const orderLimiter = rateLimit({
     message: tooManyMsg
 });
 
-// Login / reset: slow down credential guessing
+// Login / reset: slow down credential guessing (IP layer; per-account lock + IP ban below add teeth)
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 20,
+    max: 10,
     standardHeaders: true,
     legacyHeaders: false,
     message: tooManyMsg
@@ -66,6 +69,15 @@ const authLimiter = rateLimit({
 const forgotLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: tooManyMsg
+});
+
+// Public order tracking: generous enough for 30s polling + manual refresh, blocks enumeration floods
+const trackLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 60,
     standardHeaders: true,
     legacyHeaders: false,
     message: tooManyMsg
@@ -151,6 +163,108 @@ function invalidateUserSessions(userId, keepToken) {
 }
 
 // ============================================
+// Login hardening — per-account lockout + IP ban + audit
+// Configurable via env so deploys can tune without code changes.
+// ============================================
+const LOGIN_MAX_FAILS = parseInt(process.env.LOGIN_MAX_FAILS, 10) || 5;
+const LOGIN_LOCK_MIN = parseInt(process.env.LOGIN_LOCK_MIN, 10) || 15;
+const LOGIN_IP_MAX_FAILS = parseInt(process.env.LOGIN_IP_MAX_FAILS, 10) || 20;
+const LOGIN_IP_BAN_MIN = parseInt(process.env.LOGIN_IP_BAN_MIN, 10) || 60;
+
+function getClientIp(req) {
+    const fwd = req.headers['x-forwarded-for'];
+    if (typeof fwd === 'string' && fwd.length) return fwd.split(',')[0].trim().slice(0, 45);
+    return (req.ip || req.connection?.remoteAddress || 'unknown').slice(0, 45);
+}
+
+// PII masking for public responses (order tracking). Phone proves ownership,
+// but we still return masked values defence-in-depth so a guessed phone
+// yields minimal personal data.
+function maskName(name) {
+    const s = String(name || '').trim();
+    if (!s) return '';
+    const parts = s.split(/\s+/);
+    if (parts.length === 1) return parts[0].slice(0, 2) + '***';
+    return parts[0] + ' ' + parts.slice(1).map(p => (p[0] || '') + '.').join(' ');
+}
+
+function maskAddress(addr) {
+    const s = String(addr || '').trim();
+    if (s.length <= 20) return s.slice(0, 5) + '***';
+    return s.slice(0, 20) + '…';
+}
+
+function maskPhone(phone) {
+    const s = String(phone || '');
+    if (s.startsWith('+213')) return '+213 ** ** ** ' + s.slice(-2);
+    if (s.length >= 6) return s.slice(0, 4) + ' ** ** ' + s.slice(-2);
+    return '***';
+}
+
+// Constant-time string compare to avoid timing oracles on phone match.
+function safeEqual(a, b) {
+    const ba = Buffer.from(String(a));
+    const bb = Buffer.from(String(b));
+    if (ba.length !== bb.length) return false;
+    try { return crypto.timingSafeEqual(ba, bb); } catch { return false; }
+}
+
+// Auth audit helpers. Tables are created in migrateDB(); every helper
+// degrades gracefully (returns "not locked") if the table is missing
+// (very old DB before migration runs).
+async function isAccountLocked(identifierKey) {
+    try {
+        const [rows] = await db.query(
+            `SELECT COUNT(*) AS c FROM auth_audit
+             WHERE identifier = ? AND success = 0 AND created_at > DATE_SUB(NOW(), INTERVAL ? MINUTE)`,
+            [identifierKey, LOGIN_LOCK_MIN]
+        );
+        return Number(rows[0]?.c || 0) >= LOGIN_MAX_FAILS;
+    } catch { return false; }
+}
+
+async function isIpBanned(ip) {
+    try {
+        const [rows] = await db.query('SELECT banned_until FROM ip_bans WHERE ip = ?', [ip]);
+        if (!rows.length || !rows[0].banned_until) return false;
+        if (new Date(rows[0].banned_until).getTime() > Date.now()) return true;
+        await db.query('DELETE FROM ip_bans WHERE ip = ?', [ip]).catch(() => {});
+        return false;
+    } catch { return false; }
+}
+
+async function recordLoginAttempt(identifierKey, ip, success) {
+    try {
+        await db.query('INSERT INTO auth_audit (identifier, ip, success) VALUES (?, ?, ?)',
+            [identifierKey.slice(0, 255), ip, success ? 1 : 0]);
+    } catch { /* audit best-effort */ }
+    if (success) {
+        try {
+            await db.query('DELETE FROM auth_audit WHERE identifier = ? AND success = 0', [identifierKey]);
+        } catch { /* ignore */ }
+        return { banned: false };
+    }
+    // Failure path: count recent IP failures, ban if over threshold.
+    try {
+        const [rows] = await db.query(
+            `SELECT COUNT(*) AS c FROM auth_audit
+             WHERE ip = ? AND success = 0 AND created_at > DATE_SUB(NOW(), INTERVAL ? MINUTE)`,
+            [ip, LOGIN_LOCK_MIN]
+        );
+        const fails = Number(rows[0]?.c || 0);
+        if (fails >= LOGIN_IP_MAX_FAILS) {
+            await db.query(
+                `INSERT INTO ip_bans (ip, banned_until, fail_count) VALUES (?, DATE_ADD(NOW(), INTERVAL ? MINUTE), ?)
+                 ON DUPLICATE KEY UPDATE banned_until = DATE_ADD(NOW(), INTERVAL ? MINUTE), fail_count = ?`,
+                [ip, LOGIN_IP_BAN_MIN, fails, LOGIN_IP_BAN_MIN, fails]
+            );
+            return { banned: true };
+        }
+    } catch { /* ignore */ }
+    return { banned: false };
+}
+
+// ============================================
 // Auth Routes
 // ============================================
 // (Validation helpers come from client/validators.js — see top of file.)
@@ -164,15 +278,34 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
         if (!identifier || !password) {
             return res.status(400).json({ success: false, message: 'Email/username and password required' });
         }
+        const ip = getClientIp(req);
+        const idKey = identifier.toLowerCase().slice(0, 255);
+        // IP ban first (applies to all identifiers from this IP — no oracle).
+        if (await isIpBanned(ip)) {
+            return res.status(403).json({ success: false, message: 'Too many attempts. Your IP is temporarily blocked. Try again later.' });
+        }
+        // Per-account lock BEFORE user lookup so non-existent identifiers lock
+        // identically — otherwise lock status would reveal which accounts exist.
+        if (await isAccountLocked(idKey)) {
+            return res.status(429).json({ success: false, message: `Too many attempts. Try again in ${LOGIN_LOCK_MIN} minutes.` });
+        }
         const [rows] = await db.query('SELECT * FROM staff WHERE username = ? OR email = ?', [identifier, identifier]);
         if (rows.length === 0) {
+            const r = await recordLoginAttempt(idKey, ip, false);
+            if (r.banned) return res.status(403).json({ success: false, message: 'Too many attempts. Your IP is temporarily blocked. Try again later.' });
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
         const user = rows[0];
         const valid = await bcrypt.compare(password, user.password);
         if (!valid) {
+            const r = await recordLoginAttempt(idKey, ip, false);
+            if (r.banned) return res.status(403).json({ success: false, message: 'Too many attempts. Your IP is temporarily blocked. Try again later.' });
+            if (await isAccountLocked(idKey)) {
+                return res.status(429).json({ success: false, message: `Too many attempts. Try again in ${LOGIN_LOCK_MIN} minutes.` });
+            }
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
+        await recordLoginAttempt(idKey, ip, true);
         const token = generateToken();
         sessions.set(token, { userId: user.id, role: user.role, username: user.username, email: user.email, full_name: user.full_name });
         // Set httpOnly cookie — invisible to JavaScript, sent automatically by the browser.
@@ -200,6 +333,10 @@ app.post('/api/auth/forgot-password', forgotLimiter, async (req, res) => {
         if (!identifier) {
             return res.status(400).json({ success: false, message: 'Email or username is required' });
         }
+        // Reuse the login IP ban so password-reset cannot be used to bypass it.
+        if (await isIpBanned(getClientIp(req))) {
+            return res.status(403).json({ success: false, message: 'Too many attempts. Your IP is temporarily blocked. Try again later.' });
+        }
         let rows;
         if (isValidEmail(identifier)) {
             [rows] = await db.query('SELECT id, full_name, email FROM staff WHERE email = ?', [identifier.toLowerCase()]);
@@ -211,7 +348,11 @@ app.post('/api/auth/forgot-password', forgotLimiter, async (req, res) => {
         }
         const user = rows[0];
         if (!user.email || !isValidEmail(user.email)) {
-            return res.status(400).json({ success: false, message: 'This account has no email on file. Ask an admin to set one first.' });
+            // PII fix: previously returned a distinct 400 revealing the account
+            // exists but has no email. Return the generic success instead and
+            // log server-side so admins can fix it without creating an oracle.
+            console.warn(`⚠️  Password-reset requested for account id=${user.id} with no valid email on file`);
+            return res.json({ success: true, message: 'If an account exists, a reset link has been sent.' });
         }
         const token = crypto.randomBytes(32).toString('hex');
         const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
@@ -503,6 +644,68 @@ app.post('/api/orders', orderLimiter, async (req, res) => {
     } catch (error) {
         console.error('Error creating order:', error);
         res.status(500).json({ success: false, message: 'Failed to place order' });
+    }
+});
+
+// Public order tracking — requires BOTH order id and phone so ids cannot be
+// enumerated. Returns masked PII only (see mask* helpers). Rate-limited for
+// polling (client polls every 30s) and to block phone-guessing floods.
+app.get('/api/orders/track', trackLimiter, async (req, res) => {
+    try {
+        const id = parseInt(req.query.id, 10);
+        const phoneRaw = String(req.query.phone || '').trim();
+        if (!Number.isInteger(id) || id <= 0 || !phoneRaw) {
+            return res.status(400).json({ success: false, message: 'Order number and phone are required' });
+        }
+        if (!isValidDZPhone(phoneRaw)) {
+            // Same generic message as not-found to avoid phone-format oracle.
+            return res.status(404).json({ success: false, message: 'Order not found. Check order number and phone.' });
+        }
+        const cleanPhone = normalizeDZPhone(phoneRaw);
+        const [rows] = await db.query(
+            `SELECT o.id, o.customer_name, o.customer_phone, o.customer_address,
+                    o.total, o.subtotal, o.delivery_fee, o.status,
+                    o.created_at, o.updated_at, o.items,
+                    dz.name AS zone_name, dz.eta_min
+             FROM orders o LEFT JOIN delivery_zones dz ON dz.id = o.zone_id
+             WHERE o.id = ? LIMIT 1`,
+            [id]
+        );
+        if (!rows.length || !safeEqual(String(rows[0].customer_phone || ''), cleanPhone)) {
+            return res.status(404).json({ success: false, message: 'Order not found. Check order number and phone.' });
+        }
+        const o = rows[0];
+        let itemsSummary = [];
+        try {
+            const arr = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []);
+            itemsSummary = (Array.isArray(arr) ? arr : []).slice(0, 50).map(it => ({
+                name: String(it.name || '').slice(0, 120),
+                quantity: Math.max(1, Math.min(99, parseInt(it.quantity, 10) || 1)),
+                price: Number(it.price) || 0
+            }));
+        } catch { itemsSummary = []; }
+        res.set('Cache-Control', 'no-store');
+        res.json({
+            success: true,
+            data: {
+                id: o.id,
+                status: o.status,
+                total: Number(o.total),
+                subtotal: o.subtotal != null ? Number(o.subtotal) : null,
+                delivery_fee: Number(o.delivery_fee || 0),
+                zone_name: o.zone_name || null,
+                eta_min: o.eta_min != null ? Number(o.eta_min) : null,
+                created_at: o.created_at,
+                updated_at: o.updated_at,
+                customer_name_masked: maskName(o.customer_name),
+                customer_address_masked: maskAddress(o.customer_address),
+                customer_phone_masked: maskPhone(String(o.customer_phone || '')),
+                items: itemsSummary
+            }
+        });
+    } catch (error) {
+        console.error('Error tracking order:', error);
+        res.status(500).json({ success: false, message: 'Failed to track order' });
     }
 });
 
@@ -1210,6 +1413,39 @@ async function migrateDB() {
                 }
             } catch (e) {
                 console.warn('⚠️  assigned_to FK note:', e.message);
+            }
+        },
+        async () => {
+            // Login hardening: audit log + IP bans (persistent across restarts).
+            await db.query(`CREATE TABLE IF NOT EXISTS auth_audit (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                identifier VARCHAR(255) NOT NULL,
+                ip VARCHAR(45) NOT NULL,
+                success TINYINT(1) NOT NULL DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_audit_ident (identifier, created_at),
+                INDEX idx_audit_ip (ip, created_at)
+            )`);
+            await db.query(`CREATE TABLE IF NOT EXISTS ip_bans (
+                ip VARCHAR(45) PRIMARY KEY,
+                banned_until DATETIME NOT NULL,
+                fail_count INT NOT NULL DEFAULT 0,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )`);
+        },
+        async () => {
+            // Order tracking lookup speed: phone match per order id.
+            try {
+                const [idx] = await db.query(
+                    `SELECT INDEX_NAME FROM information_schema.STATISTICS
+                     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'orders' AND INDEX_NAME = 'idx_orders_phone'`
+                );
+                if (idx.length === 0) {
+                    await db.query('ALTER TABLE orders ADD INDEX idx_orders_phone (customer_phone)');
+                    console.log('✅ Added orders phone index');
+                }
+            } catch (e) {
+                console.warn('⚠️  orders phone index note:', e.message);
             }
         }
     ];

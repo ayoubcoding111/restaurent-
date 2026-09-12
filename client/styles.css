@@ -1436,6 +1436,49 @@ body {
   letter-spacing: 0.5px;
 }
 
+/* ============================================
+   Order Tracking Page
+   ============================================ */
+.track-form {
+  max-width: 520px;
+  margin: 0 auto 1.5rem;
+}
+.track-result {
+  max-width: 640px;
+  margin: 0 auto 3rem;
+  padding: 1.5rem;
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+}
+.track-timeline {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.track-step {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  opacity: 0.45;
+  font-size: 0.9rem;
+}
+.track-step .track-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  flex-shrink: 0;
+}
+.track-step.done { opacity: 1; }
+.track-step.done .track-dot { background: var(--primary-color); }
+.track-step.current { font-weight: 800; }
+.track-items {
+  margin: 0.75rem 0 0;
+  padding-left: 1.2rem;
+}
+
 .form-hint {
   display: block;
   margin-top: 0.35rem;

@@ -932,7 +932,7 @@
       "label": "sw.js",
       "_origin": "ast",
       "community": 13,
-      "community_name": "sw.js",
+      "community_name": "Service Worker & PWA",
       "file_type": "code",
       "norm_label": "sw.js",
       "source_file": "client/sw.js",
@@ -943,22 +943,22 @@
       "label": "SHELL",
       "_origin": "ast",
       "community": 13,
-      "community_name": "sw.js",
+      "community_name": "Service Worker & PWA",
       "file_type": "code",
       "norm_label": "shell",
       "source_file": "client/sw.js",
       "source_location": "L4"
     },
     {
-      "id": "client_sw_rationale_42",
+      "id": "client_sw_rationale_41",
       "label": "NOTE: every other /api/* request (auth, orders, zones, staff, reviews,",
       "_origin": "ast",
       "community": 13,
-      "community_name": "sw.js",
+      "community_name": "Service Worker & PWA",
       "file_type": "rationale",
       "norm_label": "note: every other /api/* request (auth, orders, zones, staff, reviews,",
       "source_file": "client/sw.js",
-      "source_location": "L42"
+      "source_location": "L41"
     },
     {
       "id": "client_admin",
@@ -5857,14 +5857,14 @@
       "weight": 1.0
     },
     {
-      "source": "client_sw_rationale_42",
+      "source": "client_sw_rationale_41",
       "target": "client_sw",
       "relation": "rationale_for",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/sw.js",
-      "source_location": "L42",
+      "source_location": "L41",
       "weight": 1.0
     },
     {

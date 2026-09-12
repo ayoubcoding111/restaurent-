@@ -66,6 +66,7 @@ const Router = {
         '': 'home',
         'home': 'home',
         'menu': 'menu',
+        'track': 'trackPage',
         'contact': 'contact',
         'cart': 'cartPage',
         'thankyou': 'thankYouPage',
@@ -148,6 +149,8 @@ const Router = {
 
         // Render specific views
         if (viewId === 'cartPage') CartPage.render();
+        if (viewId === 'trackPage' && typeof Track !== 'undefined') Track.render();
+        else if (typeof Track !== 'undefined' && viewId !== 'trackPage') Track.stopPolling();
         if (viewId === 'staffDashboard') StaffDashboard.render();
         if (viewId === 'adminDashboard') AdminDashboard.render();
 
@@ -784,6 +787,12 @@ const Checkout = {
                 orderIdEl.textContent = `#${data.orderId}`;
                 orderIdEl.classList.remove('hidden');
             }
+            // Handoff to tracking: remember id+phone and deep-link the button.
+            try {
+                if (typeof Track !== 'undefined' && data.orderId) Track.saveLast(data.orderId, phone);
+                const trackBtn = document.getElementById('thankYouTrackBtn');
+                if (trackBtn && data.orderId) trackBtn.href = `#track?id=${data.orderId}&phone=${encodeURIComponent(phone)}`;
+            } catch { /* ignore */ }
             location.hash = '#thankyou';
         } catch {
             showFormMsg('checkoutError', I18n.t('order_failed'));
@@ -951,8 +960,12 @@ function initLoginModal() {
             Auth.renderFooterAuth();
             e.target.reset();
             Router.go(result.role === 'admin' ? '#admin' : '#staff');
+        } else if (result._status === 429) {
+            showFormMsg('loginError', I18n.t('login_rate'));
+        } else if (result._status === 403) {
+            showFormMsg('loginError', I18n.t('login_banned'));
         } else {
-            showFormMsg('loginError', I18n.t('login_bad'));
+            showFormMsg('loginError', result.message || I18n.t('login_bad'));
         }
     });
 
@@ -1120,5 +1133,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ScrollReveal.init();
     MenuDisplay.init();
     Checkout.init();
+    if (typeof Track !== 'undefined') Track.init();
     Router.init();
 });
