@@ -1,23 +1,23 @@
 # Graph Report - Project2  (2026-09-13)
 
 ## Corpus Check
-- 36 files · ~299,960 words
+- 37 files · ~301,406 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 283 nodes · 289 edges · 34 communities (19 shown, 14 thin omitted)
+- 287 nodes · 295 edges · 34 communities (20 shown, 13 thin omitted)
 - Extraction: 92% EXTRACTED · 8% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.79)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7d37a8b4`
+- Built from commit: `40154ece`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - Frontend SPA & Features
 - server.js
-- Client App Logic
+- app.js
 - NPM Dependencies
 - Code Quality Skill
 - Package Dependencies
@@ -34,7 +34,7 @@
 - Cart Module
 - i18n Module
 - Icons Module
-- UI Module
+- ui.js
 - What You Must Do When Invoked
 - /graphify
 - graphify reference: extra exports and benchmark
@@ -47,7 +47,7 @@
 - graphify reference: transcribe video and audio
 - extraction-spec.md
 - track.js
-- validators.js
+- admin-app.js
 
 ## God Nodes (most connected - your core abstractions)
 1. `Delicious Restaurant` - 21 edges
@@ -81,7 +81,7 @@
 - **Beverage Products** — client_imgs_coca_coca_cola_can, client_imgs_sprite_sprite_can [INFERRED 0.85]
 - **Pizza Menu Products** — client_imgs_3fromages_four_cheese_pizza, client_imgs_4seasons_four_seasons_pizza, client_imgs_mega_all_cheese_pizza, client_imgs_frontpic_hero_pizza_image [INFERRED 0.85]
 
-## Communities (34 total, 14 thin omitted)
+## Communities (34 total, 13 thin omitted)
 
 ### Community 0 - "Frontend SPA & Features"
 Cohesion: 0.06
@@ -89,11 +89,11 @@ Nodes (39): Cart Page Section, Checkout Modal, Confirm Dialog Modal, Customize I
 
 ### Community 1 - "server.js"
 Cohesion: 0.05
-Nodes (30): app, authenticateToken(), authLimiter, bcrypt, bootstrapAdmin(), clientDir, cors, crypto (+22 more)
+Nodes (34): isValidDZPhone(), isValidEmail(), normalizeDZPhone(), app, authenticateToken(), authLimiter, bcrypt, bootstrapAdmin() (+26 more)
 
-### Community 2 - "Client App Logic"
-Cohesion: 0.09
-Nodes (21): API, AppState, CartBadge, CartPage, Checkout, closeConfirm(), copyPhone(), Customizer (+13 more)
+### Community 2 - "app.js"
+Cohesion: 0.12
+Nodes (15): API, AppState, CartBadge, CartPage, Checkout, Customizer, initHamburger(), isValidDZPhone() (+7 more)
 
 ### Community 3 - "NPM Dependencies"
 Cohesion: 0.08
@@ -131,6 +131,10 @@ Nodes (3): KitchenAlerts, KitchenFlow, StaffDashboard
 Cohesion: 1.00
 Nodes (3): Pizza Slice SVG Favicon, Brand Logo Icon 192px, Brand Logo Icon 512px
 
+### Community 19 - "ui.js"
+Cohesion: 0.24
+Nodes (5): closeConfirm(), copyPhone(), initConfirmModal(), toast(), UI
+
 ### Community 20 - "What You Must Do When Invoked"
 Cohesion: 0.13
 Nodes (15): Part A - Structural extraction for code files, Part B - Semantic extraction (parallel subagents), Part C - Merge AST + semantic into final extraction, Step 0 - GitHub repos and multi-path merge (only if a URL or several paths), Step 1 - Ensure graphify is installed, Step 2.5 - Video and audio (only if video files detected), Step 2 - Detect files, Step 3 - Extract entities and relationships (+7 more)
@@ -160,24 +164,24 @@ Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
 ## Knowledge Gaps
-- **161 isolated node(s):** `AppState`, `ScrollReveal`, `API`, `Router`, `ThemeManager` (+156 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 203 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **14 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **162 isolated node(s):** `AdminGate`, `AdminDashboard`, `AppState`, `ScrollReveal`, `API` (+157 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 206 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Delicious Restaurant` connect `Frontend SPA & Features` to `Code Quality Skill`?**
-  _High betweenness centrality (0.035) - this node is a cross-community bridge._
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
 - **Why does `SPA Entry Point (index.html)` connect `Frontend SPA & Features` to `Admin Dashboard Panels`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+  _High betweenness centrality (0.028) - this node is a cross-community bridge._
 - **Why does `Anti-Koshary Skill` connect `Code Quality Skill` to `Frontend SPA & Features`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
-- **What connects `AppState`, `ScrollReveal`, `API` to the rest of the system?**
-  _161 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _High betweenness centrality (0.019) - this node is a cross-community bridge._
+- **What connects `AdminGate`, `AdminDashboard`, `AppState` to the rest of the system?**
+  _162 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Frontend SPA & Features` be split into smaller, more focused modules?**
   _Cohesion score 0.0553306342780027 - nodes in this community are weakly interconnected._
 - **Should `server.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.05094130675526024 - nodes in this community are weakly interconnected._
-- **Should `Client App Logic` be split into smaller, more focused modules?**
-  _Cohesion score 0.08994708994708994 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.04964539007092199 - nodes in this community are weakly interconnected._
+- **Should `app.js` be split into smaller, more focused modules?**
+  _Cohesion score 0.12280701754385964 - nodes in this community are weakly interconnected._

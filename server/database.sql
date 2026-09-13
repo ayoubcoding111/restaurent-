@@ -104,10 +104,24 @@ CREATE TABLE IF NOT EXISTS orders (
     subtotal DECIMAL(10, 2) DEFAULT NULL,
     delivery_fee DECIMAL(10, 2) NOT NULL DEFAULT 0,
     assigned_to INT DEFAULT NULL,
+    delivered_at DATETIME DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (assigned_to) REFERENCES staff(id) ON DELETE SET NULL,
-    INDEX idx_orders_phone (customer_phone)
+    INDEX idx_orders_phone (customer_phone),
+    INDEX idx_orders_purge (status, delivered_at)
+);
+
+-- ============================================
+-- Delivery stats (daily aggregates kept AFTER delivered
+-- orders are purged — 24h grace, then hard-delete for PII)
+-- ============================================
+CREATE TABLE IF NOT EXISTS delivery_stats (
+    day DATE PRIMARY KEY,
+    placed_count INT NOT NULL DEFAULT 0,
+    placed_revenue DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    delivered_count INT NOT NULL DEFAULT 0,
+    delivered_revenue DECIMAL(10, 2) NOT NULL DEFAULT 0
 );
 
 -- ============================================

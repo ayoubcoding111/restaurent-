@@ -5,11 +5,14 @@
 ![Vanilla JS](https://img.shields.io/badge/Frontend-Vanilla_JS-F7DF1E?logo=javascript&logoColor=black)
 ![License](https://img.shields.io/badge/License-ISC-blue)
 
-A full-stack food ordering and delivery platform: customers browse the menu and place
-orders directly (Algerian phone validation), staff run a **live kitchen dashboard**
-with new-order alerts and click-to-copy phone numbers, and admins get
-**analytics, staff/menu management, email login and password reset** — in
-**English, French and Arabic (RTL)**. No frontend frameworks, no build step.
+A full-stack food ordering and delivery platform. Customers browse the menu, place
+orders (Algerian phone validation) and **track them live** by order number + phone.
+Staff run a **live kitchen dashboard** with new-order alerts, and admins manage
+everything from a separate **`/admin` portal** — analytics, staff/menu management,
+email login and password reset — in **English, French and Arabic (RTL)**.
+No frontend frameworks, no build step. Brute-force resistant auth (per-account
+lockout + IP bans) and delivered orders auto-purge after 24 h (counts + revenue
+kept for analytics, customer PII deleted).
 
 ## Table of Contents
 
@@ -20,6 +23,7 @@ with new-order alerts and click-to-copy phone numbers, and admins get
 - [API Reference](#api-reference)
 - [Database Schema](#database-schema)
 - [User Guide](#user-guide)
+- [Technical Highlights](#technical-highlights)
 - [Design Decisions](#design-decisions)
 - [Roadmap](#roadmap)
 - [License](#license)
@@ -38,18 +42,30 @@ with new-order alerts and click-to-copy phone numbers, and admins get
 - Direct checkout saved to MySQL with **Algerian phone validation**
   (`05` / `06` / `07` — 10 digits — or `+213…`, spaces/dashes allowed),
   validated in both frontend and backend, with a confirmation page + order number
-- Click-to-copy customer phone in staff/admin order cards (clipboard + toast)
-- Rate-limited public endpoints (`express-rate-limit`): orders, login, password reset
+  that deep-links into **live order tracking**
+- Rate-limited public endpoints (`express-rate-limit`): orders, tracking, login, password reset
 - Dark / light theme toggle (persisted)
 
-### 🔔 Staff dashboard — live kitchen view
-- Order list with status badges (`pending` / `confirmed` / `delivered`) and status filters
-- One-click status flow: Pending → Confirmed → Delivered
+### 📦 Order tracking
+- `#track` page: order number + phone → live status timeline
+  (`pending → confirmed → preparing → ready → on the way → delivered`),
+  auto-refresh every 30 s (pauses when the tab is hidden), pre-filled from your last order
+- Privacy-first: requires **both** id and phone, rate-limited, returns masked
+  name/address/phone only, `Cache-Control: no-store` — wrong id/phone gives the
+  same generic “not found”, so orders can't be enumerated
+
+### 🔔 Staff dashboard — live kitchen view (served at `/admin`)
+- Order list with status badges (`pending` / `confirmed` / `preparing` / `ready` /
+  `on_way` / `delivered`) and status filters
+- One-click status flow: Pending → Confirmed → Preparing → Ready → On the way → Delivered
 - **Live alerts**: auto-refresh every 15 s, chime + flashing NEW highlight on new orders
 - Optional **browser notifications** (works even in another tab), persisted sound toggle
 - Polling pauses automatically when the tab is hidden or you leave the dashboard
+- Click-to-copy customer phone in order cards (clipboard + toast)
 
-### 🛠️ Admin dashboard
+### 🛠️ Admin dashboard (separate `/admin` page — zero admin code on the client page)
+- Dedicated login gate: logged-out visitors see a login page; sessions verified via
+  `/api/auth/me` before any dashboard renders; staff see the kitchen view, admins everything
 - **Staff management** — create accounts (username + email + role), **edit infos/credentials**
   (incl. password reset), list, delete
 - **My Account panel** — admin edits own profile and changes password (current-password check)
@@ -59,21 +75,34 @@ with new-order alerts and click-to-copy phone numbers, and admins get
 - **Analytics tab** — all-time + delivered-only revenue cards, 7/14/30-day ranges with
   previous-period comparison deltas, SVG revenue bar chart and orders-vs-delivered line
   chart per day, status breakdown, top items, one-click **orders CSV export**.
-  Orders (including delivered) are never deleted, so history only grows.
+  Delivered orders stay visible for a 24 h grace period, then roll up into
+  daily counts + revenue (`delivery_stats`) and hard-delete (customer PII
+  minimization) — lifetime analytics merge both sources.
 - Full-height **sidebar navigation** pinned to the screen edge (top-anchored circular
   hamburger, drawer + overlay on mobile), icon chips, smooth slide, across all panels
   (Staff, Orders, Menu, Analytics, My Account)
 - Inline form errors/success, toast notifications and a custom confirm dialog — no `alert()` popups
 
 ### 🔐 Authentication & accounts
-- Role-based access control (`admin` / `staff`), token-based sessions, bcrypt hashing
+- Role-based access control (`admin` / `staff`), token-based sessions (httpOnly cookie
+  + `Bearer` fallback), bcrypt hashing
 - Login with **username or email**
+- **Brute-force defense in depth**: IP rate limits + per-account lockout
+  (5 fails → 15 min lock) + automatic IP bans (20 fails → 60 min block),
+  persisted in `auth_audit` / `ip_bans` so server restarts don't reset them —
+  all tunable via `LOGIN_*` env vars, all responses generic (no account oracle)
 - **Password reset via real email**: time-limited (1 h) token link, powered by Nodemailer/SMTP
-- Accounts without an email on file get a clear error instead of a silent failure
+- Accounts without an email on file get the same generic response (no existence leak)
 - dev-friendly: without SMTP configured, the reset link is shown in the UI/server logs for testing
-- Self-healing sessions: expired tokens auto-redirect to login with a clear message instead
+- Self-healing sessions: expired tokens return to the login view with a clear message instead
   of failing every action (note: sessions live in server memory, so a server restart logs
   everyone out — see Roadmap for persistent sessions)
+
+### 🧹 Data retention & privacy
+- Delivered orders stay visible for a **24 h grace period** (tracking shows “Delivered”),
+  then an hourly job rolls them into daily `delivery_stats` (counts + revenue) and
+  **hard-deletes** them — names, phones, addresses, items all gone
+- Lifetime analytics transparently merge active rows + aggregates, so charts never hollow out
 
 ### 🌍 Languages & polish
 - **English / French / Arabic** globe-menu in the navbar (🇬🇧 / 🇫🇷 / 🇩🇿 flags inside,
@@ -100,7 +129,7 @@ cp .env.example .env   # then edit .env
 # 4. Start the server
 npm start               # or: npm run dev (auto-reload with nodemon)
 
-# 5. Open http://localhost:3000
+# 5. Open http://localhost:3000 — customers order here, staff/admin work at http://localhost:3000/admin
 ```
 
 > Fresh installs seed a default admin (`admin` / `admin123`). Sign in and change the
@@ -119,6 +148,8 @@ All settings live in `server/.env` (git-ignored — see `server/.env.example`):
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` | For email | — | e.g. `smtp.gmail.com` / `587` / `false` |
 | `SMTP_USER` / `SMTP_PASS` | For email | — | SMTP login — for Gmail use an **App Password** |
 | `MAIL_FROM` | No | `SMTP_USER` | `From:` header for reset emails |
+| `LOGIN_MAX_FAILS` / `LOGIN_LOCK_MIN` | No | `5` / `15` | Fails before per-account lockout + lock minutes |
+| `LOGIN_IP_MAX_FAILS` / `LOGIN_IP_BAN_MIN` | No | `20` / `60` | Fails before IP ban + ban minutes |
 
 ### Enabling real password-reset emails (Gmail)
 
@@ -143,18 +174,22 @@ All settings live in `server/.env` (git-ignored — see `server/.env.example`):
 ```
 Project2/
 ├── client/                      # Frontend (static, served by Express — no build step)
-│   ├── index.html               # SPA entry point (nav, hero, menu, cart, dashboards, modals)
+│   ├── index.html               # Client SPA: menu, cart, tracking, checkout (no auth/admin code)
+│   ├── admin.html               # Staff/admin portal: login gate + kitchen + admin dashboards
+│   ├── admin-app.js             # /admin boot: session gate, login wiring, dashboard render
+│   ├── app.js                   # Client SPA: hash router, menu, cart page, checkout, tracking
+│   ├── track.js                 # Public order-tracking page (30 s polling, masked PII)
+│   ├── ui.js                    # Shared UI primitives (toasts, confirms, escaping, copy)
 │   ├── styles.css               # Themes, dashboards, charts, responsive, RTL
 │   ├── i18n.js                  # EN/FR/AR dictionaries, globe-menu switcher, RTL handling
 │   ├── icons.js                 # Shared inline-SVG icon set (cart, globe, status, actions…)
-│   ├── app.js                   # Hash router, menu display, cart page, checkout, modal wiring
 │   ├── cart.js                  # localStorage-backed shopping cart
 │   ├── auth.js                  # Login, logout, forgot/reset password API + modals
 │   ├── staff.js                 # Staff dashboard + shared KitchenAlerts live watcher
 │   ├── admin.js                 # Admin dashboard: staff / orders / menu / analytics tabs
 │   └── imgs/                    # Static images
 ├── server/
-│   ├── server.js                # Express app: auth, staff, orders, items, analytics routes
+│   ├── server.js                # Express app: pages, auth hardening, orders, items, analytics, purge job
 │   ├── config/
 │   │   ├── db.js                # MySQL connection pool (mysql2)
 │   │   └── mailer.js            # Nodemailer SMTP sender + dev fallback
@@ -186,8 +221,9 @@ Project2/
 | PATCH | `/api/auth/profile` | User | Edit own username / email / full name |
 | POST | `/api/auth/change-password` | User | Change own password (current-password check, other sessions dropped) |
 | POST | `/api/orders` | — | Place order (customer name/phone/address, items JSON, `zone_id` optional — fee computed server-side) |
-| GET | `/api/orders` | User | All orders, newest first (includes `zone_name`, `subtotal`, `delivery_fee`, `assigned_to`/`assigned_name`) |
-| PATCH | `/api/orders/:id/status` | User | Set `pending` / `confirmed` / `preparing` / `ready` / `on_way` / `delivered` |
+| GET | `/api/orders/track?id=&phone=` | — | Track one order (both required, rate-limited, masked PII only, `no-store`) |
+| GET | `/api/orders` | User | Active orders, newest first (delivered auto-purge 24 h after delivery; includes `zone_name`, `subtotal`, `delivery_fee`, `assigned_to`/`assigned_name`) |
+| PATCH | `/api/orders/:id/status` | User | Set `pending` / `confirmed` / `preparing` / `ready` / `on_way` / `delivered` (`delivered` starts the 24 h purge clock) |
 | PATCH | `/api/orders/:id/assign` | User | Assign/unassign order (`{ staff_id }` or null) |
 | GET | `/api/zones` | — | Public active delivery zones (fee, `free_over`, `eta_min`) |
 | GET | `/api/zones?all=1` | Admin | All zones incl. inactive |
@@ -200,7 +236,8 @@ Project2/
 | PATCH | `/api/reviews/:id` | Admin | Approve/hide (`{ is_approved }`) |
 | DELETE | `/api/reviews/:id` | Admin | Delete review |
 | GET | `/api/staff/names` | User | Lightweight id/name list (assignment dropdown) |
-| GET | `/api/analytics?days=14` | Admin | Totals + delivered revenue, daily series (7–90 days), prev-period comparison, top-8 items |
+| GET | `/api/analytics?days=14` | Admin | Lifetime totals + delivered revenue (active rows merged with purged aggregates), daily series (7–90 days), prev-period comparison, top-8 items |
+| GET | `/admin` | — | Staff/admin web portal (static page; APIs behind it still enforce auth + role) |
 | GET | `/api/staff` | Admin | List accounts (no password hashes) |
 | POST | `/api/staff` | Admin | Create account (username, email, password ≥ 6, full name, role) |
 | PATCH | `/api/staff/:id` | Admin | Edit infos / role / credentials (blank password = keep; can't change own role) |
@@ -222,7 +259,12 @@ staff   → id, username UNIQUE, email UNIQUE, password (bcrypt),
 orders  → id, customer_name, customer_phone, customer_address,
           items JSON, total, status(pending|confirmed|preparing|ready|on_way|delivered),
           zone_id, subtotal, delivery_fee, assigned_to → staff(id) ON DELETE SET NULL,
-          created_at, updated_at
+          delivered_at (24 h purge clock), created_at, updated_at
+          (delivered rows older than 24 h are aggregated, then hard-deleted)
+delivery_stats → day DATE PK, placed_count, placed_revenue,
+          delivered_count, delivered_revenue (survives the purge; powers charts)
+auth_audit → id, identifier, ip, success, created_at (login hardening)
+ip_bans → ip PK, banned_until, fail_count, updated_at (persistent IP bans)
 reviews → id, item_id → items(id) ON DELETE CASCADE, rater_name,
           rating(1–5), comment, is_approved, created_at
 delivery_zones → id, name (+ name_fr / name_ar), fee,
@@ -231,9 +273,10 @@ delivery_zones → id, name (+ name_fr / name_ar), fee,
 
 On boot the server auto-migrates missing columns (`items.description`, `staff.email`,
 `staff.reset_token`, `staff.reset_expires`, `item_options.*_fr/_ar`,
-`orders.zone_id/subtotal/delivery_fee/assigned_to`, extended order `status` enum),
-creates the `item_options`, `reviews` and `delivery_zones` tables with samples,
-backfills FR/AR option names, and seeds an admin
+`orders.zone_id/subtotal/delivery_fee/assigned_to/delivered_at`, extended order `status` enum),
+creates the `item_options`, `reviews`, `delivery_zones`, `delivery_stats`, `auth_audit`
+and `ip_bans` tables with samples, backfills FR/AR option names and `delivered_at`
+for pre-existing delivered orders, and seeds an admin
 only if none exists — safe to restart or re-run `database.sql` on a fresh DB.
 
 ## User Guide
@@ -244,18 +287,40 @@ only if none exists — safe to restart or re-run `database.sql` on a fresh DB.
   (Algerian mobile required: `05`/`06`/`07` or `+213…`) →
   order is stored and a confirmation page shows the order number.
   Leave a star rating + comment per dish (approved by admin before it shows).
-- **Staff:** *Staff / Admin Login* (footer) → `#staff` → watch the Live feed, click
+- **Tracking:** open `#track` (or the *Track this order* button) → enter order number +
+  phone → live status timeline, auto-refreshing. Wrong id/phone yields the same
+  generic “not found” — your orders stay private.
+- **Staff:** open `/admin` → log in → watch the Live feed, click
   *Notify* for background alerts, click a customer phone number to copy it,
   confirm and deliver orders as they come in.
-- **Admin:** log in → `#admin` → manage staff (email required for password resets,
+- **Admin:** open `/admin` → log in → manage staff (email required for password resets,
   edit any account incl. credentials), curate the menu (details, photos, priced
   EN/FR/AR options), manage **delivery zones** (fees, free-over thresholds, ETAs),
   moderate **reviews** (approve/hide/delete), check *Analytics* (export CSV for bookkeeping),
   and update your own profile under *My Account*.
-- **Forgot password:** *Login → Forgot password?* → enter email/username → open the emailed
-  `#reset-password?token=…` link within 1 hour → set a new password → log in.
+- **Forgot password:** on `/admin` → *Forgot password?* → enter email/username → open the emailed
+  `/admin#reset-password?token=…` link within 1 hour → set a new password → log in.
 - **Language:** EN/FR/AR globe menu in the navbar (flags inside); Arabic flips the whole
   layout to RTL, including dishes and option names.
+
+## Technical Highlights
+
+What this project demonstrates beyond CRUD:
+
+- **Separated attack surfaces** — the public page (`/`) ships zero auth/admin code;
+  staff and admins work in an isolated `/admin` portal. Downloading admin JS grants
+  nothing: every sensitive endpoint re-checks the session server-side (`server.js`,
+  `client/admin-app.js`).
+- **Layered auth defense** — IP rate limits, per-account lockout, persistent IP bans
+  (`auth_audit` / `ip_bans`), bcrypt, httpOnly cookies, and enumeration-safe responses
+  on every public auth/order endpoint.
+- **Privacy by design** — order tracking needs id + phone and returns masked PII;
+  delivered orders hard-delete after 24 h while daily aggregates keep analytics exact
+  (`delivery_stats` + transactional purge in `purgeDeliveredOrders()`).
+- **Zero-build frontend** — vanilla JS SPA with hash routing, hand-rolled SVG analytics
+  charts, WebAudio kitchen alerts, trilingual RTL (EN/FR/AR), offline-capable PWA.
+- **Operable backend** — auto-migrations on boot, seed-safe restarts, env-tunable limits,
+  keyset pagination on growing tables.
 
 ## Design Decisions
 
@@ -265,18 +330,24 @@ only if none exists — safe to restart or re-run `database.sql` on a fresh DB.
 - **Token sessions in memory** — simple deploy story; reset-password rotates credentials by
   wiping the user's sessions.
 - **Anti-enumeration responses** — forgot-password never reveals whether an account exists.
+- **Client/admin split** — one public page with no secrets, one gated portal; shared
+  UI primitives live in `ui.js` so fixes apply to both (no duplicated logic).
+- **Aggregate-then-delete retention** — charts stay correct forever while customer PII
+  has a 24 h TTL; delivery-day vs created-day aggregates keep both chart axes honest.
 - **Dependency-free charts/alerts/icons** — hand-rolled SVG analytics charts, WebAudio
   kitchen chime and a shared inline-SVG icon set need no extra libraries; the only
   runtime additions are `mysql2`, `nodemailer`, `multer`.
 
 ## Roadmap
 
+- [x] Customer order tracking page (live status by phone/order id)
+- [x] Login rate-limiting, per-account lockout, IP bans and audit log
+- [x] Separate client/admin portals (`/` + `/admin`)
+- [x] Delivered-order auto-purge with aggregate analytics
 - [ ] Online payments (e.g. CIB / EDAHABIA via a local gateway)
-- [ ] Customer order tracking page (live status by phone/order id)
 - [ ] Order-ready SMS/push notifications
 - [ ] Promo codes
 - [ ] Persistent sessions (DB/Redis) for multi-instance deploys
-- [ ] Login rate-limiting and audit log
 
 ## License
 

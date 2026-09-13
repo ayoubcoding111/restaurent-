@@ -69,9 +69,7 @@ const Router = {
         'track': 'trackPage',
         'contact': 'contact',
         'cart': 'cartPage',
-        'thankyou': 'thankYouPage',
-        'staff': 'staffDashboard',
-        'admin': 'adminDashboard'
+        'thankyou': 'thankYouPage'
     },
 
     init() {
@@ -97,41 +95,8 @@ const Router = {
         const viewId = this.routes[hashPath] || 'home';
         AppState.currentView = viewId;
 
-        // Password-reset link: #reset-password?token=xxx
-        if (hashPath === 'reset-password') {
-            const token = Auth.getResetTokenFromHash();
-            if (token) {
-                Auth.showResetModal(token);
-            } else {
-                Auth.showResetModal(null);
-                showFormMsg('resetError', 'Invalid or missing reset link. Please request a new one.');
-            }
-            return;
-        }
-
-        // Auth-protected routes — a saved token alone isn't enough: the server
-        // forgets sessions on restart, so verify it before rendering dashboards.
-        if (viewId === 'staffDashboard' || viewId === 'adminDashboard') {
-            if (!Auth.isLoggedIn()) {
-                location.hash = '#home';
-                Auth.showLoginModal();
-                return;
-            }
-            const me = await Auth.fetchMe();
-            if (!me) {
-                await Auth.logout();
-                Auth.showLoginModal();
-                return;
-            }
-        }
-        if (viewId === 'staffDashboard' && Auth.getRole() !== 'staff' && Auth.getRole() !== 'admin') {
-            location.hash = '#home';
-            return;
-        }
-        if (viewId === 'adminDashboard' && !Auth.isAdmin()) {
-            location.hash = '#home';
-            return;
-        }
+        // NOTE: staff/admin dashboards and password-reset live on /admin now.
+        // Unknown hashes fall back to home.
 
         // Hide all dedicated page sections
         document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'));
@@ -151,8 +116,6 @@ const Router = {
         if (viewId === 'cartPage') CartPage.render();
         if (viewId === 'trackPage' && typeof Track !== 'undefined') Track.render();
         else if (typeof Track !== 'undefined' && viewId !== 'trackPage') Track.stopPolling();
-        if (viewId === 'staffDashboard') StaffDashboard.render();
-        if (viewId === 'adminDashboard') AdminDashboard.render();
 
         // Scroll
         const targetEl = document.getElementById(viewId);
@@ -599,38 +562,6 @@ function isValidDZPhone(phone) {
         : /^(\+213|0)(5|6|7)\d{8}$/.test(normalizeDZPhone(phone));
 }
 
-function escAttr(s) {
-    return String(s == null ? '' : s)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-}
-
-// Click a customer phone in staff/admin to copy it to the clipboard
-async function copyPhone(phone) {
-    const text = String(phone || '');
-    if (!text) return;
-    try {
-        await navigator.clipboard.writeText(text);
-        toast(I18n.t('copied'));
-    } catch {
-        try {
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            ta.style.position = 'fixed';
-            ta.style.opacity = '0';
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            ta.remove();
-            toast(I18n.t('copied'));
-        } catch {
-            toast(I18n.t('copy_failed'), 'error');
-        }
-    }
-}
-
 // ============================================
 // Delivery zones — cached public list, fee math mirrors server
 // ============================================
@@ -837,62 +768,7 @@ function flyToCart(fromEl) {
 }
 
 // ============================================
-// Inline messages + toasts + confirm dialog
-// (replaces blocking alert()/confirm() popups)
-// ============================================
-function showFormMsg(id, msg, type = 'error') {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = msg;
-    el.classList.remove('hidden', 'form-error', 'form-success', 'shake');
-    void el.offsetWidth; // restart shake animation
-    el.classList.add(type === 'success' ? 'form-success' : 'form-error', 'shake');
-    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function hideFormMsg(id) {
-    document.getElementById(id)?.classList.add('hidden');
-}
-
-function toast(msg, type = 'success') {
-    let wrap = document.getElementById('toastWrap');
-    if (!wrap) {
-        wrap = document.createElement('div');
-        wrap.id = 'toastWrap';
-        document.body.appendChild(wrap);
-    }
-    const el = document.createElement('div');
-    el.className = `toast toast-${type}`;
-    el.textContent = msg;
-    wrap.appendChild(el);
-    setTimeout(() => {
-        el.classList.add('out');
-        setTimeout(() => el.remove(), 320);
-    }, 2800);
-}
-
-let _confirmResolve = null;
-function askConfirm(message, confirmText) {
-    const modal = document.getElementById('confirmModal');
-    document.getElementById('confirmMsg').textContent = message;
-    document.getElementById('confirmYesBtn').textContent = confirmText || I18n.t('delete_btn');
-    modal.classList.add('active');
-    return new Promise(resolve => { _confirmResolve = resolve; });
-}
-
-function closeConfirm(result) {
-    document.getElementById('confirmModal').classList.remove('active');
-    if (_confirmResolve) {
-        _confirmResolve(result);
-        _confirmResolve = null;
-    }
-}
-
-function initConfirmModal() {
-    document.getElementById('confirmYesBtn').addEventListener('click', () => closeConfirm(true));
-    document.getElementById('confirmNoBtn').addEventListener('click', () => closeConfirm(false));
-}
-
+// Inline messages + toasts + confirm dialog now live in ui.js (shared with admin page).
 // ============================================
 // Navigation Links
 // ============================================
@@ -944,179 +820,7 @@ function initHamburger() {
     });
 }
 
-// ============================================
-// Login / Password-Reset Modal Wiring
-// ============================================
-function initLoginModal() {
-    document.querySelector('.close-login').addEventListener('click', () => Auth.hideLoginModal());
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        hideFormMsg('loginError');
-        const identifier = document.getElementById('loginUsername').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        const result = await Auth.login(identifier, password);
-        if (result.success) {
-            Auth.hideLoginModal();
-            Auth.renderFooterAuth();
-            e.target.reset();
-            Router.go(result.role === 'admin' ? '#admin' : '#staff');
-        } else if (result._status === 429) {
-            showFormMsg('loginError', I18n.t('login_rate'));
-        } else if (result._status === 403) {
-            showFormMsg('loginError', I18n.t('login_banned'));
-        } else {
-            showFormMsg('loginError', result.message || I18n.t('login_bad'));
-        }
-    });
-
-    // Forgot password flow
-    document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
-        e.preventDefault();
-        Auth.showForgotModal();
-    });
-    document.querySelector('.close-forgot').addEventListener('click', () => Auth.hideForgotModal());
-    document.getElementById('backToLoginLink').addEventListener('click', (e) => {
-        e.preventDefault();
-        Auth.hideForgotModal();
-        Auth.showLoginModal();
-    });
-    document.getElementById('forgotForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        hideFormMsg('forgotError');
-        hideFormMsg('forgotSuccess');
-        const identifier = document.getElementById('forgotEmail').value.trim();
-        const btn = e.target.querySelector('button[type="submit"]');
-        btn.disabled = true;
-        btn.textContent = 'Sending...';
-        try {
-            const result = await Auth.forgotPassword(identifier);
-            if (result.success) {
-                // Dev mode without SMTP: backend returns the reset link — render it
-                // as a clickable link inside the success box.
-                if (result.debugResetUrl) {
-                    console.log('Dev reset link:', result.debugResetUrl);
-                    const box = document.getElementById('forgotSuccess');
-                    box.textContent = (result.message || 'Reset link generated.') + ' ';
-                    const a = document.createElement('a');
-                    a.href = result.debugResetUrl;
-                    a.textContent = I18n.t('dev_open');
-                    box.appendChild(a);
-                    box.classList.remove('hidden', 'form-error', 'shake');
-                    box.classList.add('form-success');
-                } else {
-                    showFormMsg('forgotSuccess', result.message || 'If an account exists, a reset link has been sent.', 'success');
-                }
-            } else {
-                showFormMsg('forgotError', result.message || 'Request failed.');
-            }
-        } catch {
-            showFormMsg('forgotError', 'Request failed. Please try again.');
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Send Reset Link';
-        }
-    });
-
-    // Reset password flow (token comes from email link)
-    document.querySelector('.close-reset').addEventListener('click', () => {
-        Auth.hideResetModal();
-        location.hash = '#home';
-    });
-    document.getElementById('resetForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        hideFormMsg('resetError');
-        hideFormMsg('resetSuccess');
-        const password = document.getElementById('resetPassword').value;
-        const confirm = document.getElementById('resetPasswordConfirm').value;
-        if (password !== confirm) {
-            showFormMsg('resetError', 'Passwords do not match.');
-            return;
-        }
-        if (password.length < (window.SharedValidators ? window.SharedValidators.PASSWORD_MIN : 6)) {
-            showFormMsg('resetError', 'Password must be at least 6 characters.');
-            return;
-        }
-        const token = Auth.getResetTokenFromHash();
-        if (!token) {
-            showFormMsg('resetError', 'Missing reset token. Please use the link from your email.');
-            return;
-        }
-        const result = await Auth.resetPassword(token, password);
-        if (result.success) {
-            showFormMsg('resetSuccess', result.message || 'Password reset. You can now log in.', 'success');
-            e.target.reset();
-            setTimeout(() => {
-                Auth.hideResetModal();
-                location.hash = '#home';
-                Auth.showLoginModal();
-            }, 1800);
-        } else {
-            showFormMsg('resetError', result.message || 'Reset failed.');
-        }
-    });
-}
-
-// ============================================
-// Admin Form Wiring
-// ============================================
-function initAdminForms() {
-    // Staff creation form
-    const staffForm = document.getElementById('adminStaffForm');
-    if (staffForm) {
-        staffForm.addEventListener('submit', (e) => AdminDashboard.createStaff(e));
-    }
-
-    // Edit item modal
-    const editItemClose = document.querySelector('.close-edit-item');
-    if (editItemClose) editItemClose.addEventListener('click', () => AdminDashboard.hideEditItem());
-    const editItemForm = document.getElementById('editItemForm');
-    if (editItemForm) editItemForm.addEventListener('submit', (e) => AdminDashboard.saveEditItem(e));
-    const addOptionBtn = document.getElementById('addOptionBtn');
-    if (addOptionBtn) addOptionBtn.addEventListener('click', () => AdminDashboard.addOptionRow());
-
-    // Edit staff modal
-    const editClose = document.querySelector('.close-edit-staff');
-    if (editClose) editClose.addEventListener('click', () => AdminDashboard.hideEditStaff());
-    const editForm = document.getElementById('editStaffForm');
-    if (editForm) editForm.addEventListener('submit', (e) => AdminDashboard.saveEditStaff(e));
-
-    // My Account forms
-    const profileForm = document.getElementById('adminProfileForm');
-    if (profileForm) profileForm.addEventListener('submit', (e) => AdminDashboard.saveProfile(e));
-    const passForm = document.getElementById('adminPasswordForm');
-    if (passForm) passForm.addEventListener('submit', (e) => AdminDashboard.changeOwnPassword(e));
-
-    // Add item form
-    const itemForm = document.getElementById('adminAddItemForm');
-    if (itemForm) {
-        itemForm.addEventListener('submit', (e) => AdminDashboard.handleAddItem(e));
-    }
-
-    // Zone form
-    const zoneForm = document.getElementById('adminZoneForm');
-    if (zoneForm) {
-        zoneForm.addEventListener('submit', (e) => AdminDashboard.createZone(e));
-    }
-
-    // Item image preview
-    const imageInput = document.getElementById('adminItemImage');
-    const imagePreview = document.getElementById('adminImagePreview');
-    if (imageInput && imagePreview) {
-        imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    imagePreview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
-                };
-                reader.readAsDataURL(file);
-            } else {
-                imagePreview.innerHTML = '';
-            }
-        });
-    }
-}
-
+// Login / password-reset / admin wiring now lives in admin-app.js (/admin page).
 // ============================================
 // App Initialization
 // ============================================
@@ -1126,9 +830,6 @@ document.addEventListener('DOMContentLoaded', () => {
     Customizer.init();
     ThemeManager.init();
     CartBadge.init();
-    Auth.init();
-    initLoginModal();
-    initAdminForms();
     initHamburger();
     ScrollReveal.init();
     MenuDisplay.init();

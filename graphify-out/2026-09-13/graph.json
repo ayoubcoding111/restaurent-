@@ -46,6 +46,42 @@
   },
   "nodes": [
     {
+      "id": "client_validators_isvaliddzphone",
+      "label": "isValidDZPhone()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "server.js",
+      "file_type": "code",
+      "norm_label": "isvaliddzphone()",
+      "source_file": "client/validators.js",
+      "source_location": "L23"
+    },
+    {
+      "id": "client_validators_isvalidemail",
+      "label": "isValidEmail()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "server.js",
+      "file_type": "code",
+      "norm_label": "isvalidemail()",
+      "source_file": "client/validators.js",
+      "source_location": "L27"
+    },
+    {
+      "id": "client_validators_normalizedzphone",
+      "label": "normalizeDZPhone()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "server.js",
+      "file_type": "code",
+      "norm_label": "normalizedzphone()",
+      "source_file": "client/validators.js",
+      "source_location": "L19"
+    },
+    {
       "id": "server_server_attachoptions",
       "label": "attachOptions()",
       "_callable": true,
@@ -55,7 +91,7 @@
       "file_type": "code",
       "norm_label": "attachoptions()",
       "source_file": "server/server.js",
-      "source_location": "L998"
+      "source_location": "L1071"
     },
     {
       "id": "server_server_attachratings",
@@ -67,7 +103,7 @@
       "file_type": "code",
       "norm_label": "attachratings()",
       "source_file": "server/server.js",
-      "source_location": "L1011"
+      "source_location": "L1084"
     },
     {
       "id": "server_server_authenticatetoken",
@@ -79,7 +115,7 @@
       "file_type": "code",
       "norm_label": "authenticatetoken()",
       "source_file": "server/server.js",
-      "source_location": "L127"
+      "source_location": "L136"
     },
     {
       "id": "server_server_bootstrapadmin",
@@ -91,7 +127,7 @@
       "file_type": "code",
       "norm_label": "bootstrapadmin()",
       "source_file": "server/server.js",
-      "source_location": "L1462"
+      "source_location": "L1576"
     },
     {
       "id": "server_server_generatetoken",
@@ -103,7 +139,7 @@
       "file_type": "code",
       "norm_label": "generatetoken()",
       "source_file": "server/server.js",
-      "source_location": "L114"
+      "source_location": "L123"
     },
     {
       "id": "server_server_getclientip",
@@ -115,7 +151,7 @@
       "file_type": "code",
       "norm_label": "getclientip()",
       "source_file": "server/server.js",
-      "source_location": "L174"
+      "source_location": "L183"
     },
     {
       "id": "server_server_invalidateusersessions",
@@ -127,7 +163,7 @@
       "file_type": "code",
       "norm_label": "invalidateusersessions()",
       "source_file": "server/server.js",
-      "source_location": "L159"
+      "source_location": "L168"
     },
     {
       "id": "server_server_isaccountlocked",
@@ -139,7 +175,7 @@
       "file_type": "code",
       "norm_label": "isaccountlocked()",
       "source_file": "server/server.js",
-      "source_location": "L215"
+      "source_location": "L224"
     },
     {
       "id": "server_server_isipbanned",
@@ -151,7 +187,7 @@
       "file_type": "code",
       "norm_label": "isipbanned()",
       "source_file": "server/server.js",
-      "source_location": "L226"
+      "source_location": "L235"
     },
     {
       "id": "server_server_maskaddress",
@@ -163,7 +199,7 @@
       "file_type": "code",
       "norm_label": "maskaddress()",
       "source_file": "server/server.js",
-      "source_location": "L191"
+      "source_location": "L200"
     },
     {
       "id": "server_server_maskname",
@@ -175,7 +211,7 @@
       "file_type": "code",
       "norm_label": "maskname()",
       "source_file": "server/server.js",
-      "source_location": "L183"
+      "source_location": "L192"
     },
     {
       "id": "server_server_maskphone",
@@ -187,7 +223,7 @@
       "file_type": "code",
       "norm_label": "maskphone()",
       "source_file": "server/server.js",
-      "source_location": "L197"
+      "source_location": "L206"
     },
     {
       "id": "server_server_migratedb",
@@ -199,7 +235,7 @@
       "file_type": "code",
       "norm_label": "migratedb()",
       "source_file": "server/server.js",
-      "source_location": "L1262"
+      "source_location": "L1335"
     },
     {
       "id": "server_server_parsecookie",
@@ -211,7 +247,19 @@
       "file_type": "code",
       "norm_label": "parsecookie()",
       "source_file": "server/server.js",
-      "source_location": "L119"
+      "source_location": "L128"
+    },
+    {
+      "id": "server_server_purgedeliveredorders",
+      "label": "purgeDeliveredOrders()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "server.js",
+      "file_type": "code",
+      "norm_label": "purgedeliveredorders()",
+      "source_file": "server/server.js",
+      "source_location": "L1608"
     },
     {
       "id": "server_server_recordloginattempt",
@@ -223,7 +271,7 @@
       "file_type": "code",
       "norm_label": "recordloginattempt()",
       "source_file": "server/server.js",
-      "source_location": "L236"
+      "source_location": "L245"
     },
     {
       "id": "server_server_requireadmin",
@@ -235,7 +283,7 @@
       "file_type": "code",
       "norm_label": "requireadmin()",
       "source_file": "server/server.js",
-      "source_location": "L148"
+      "source_location": "L157"
     },
     {
       "id": "server_server_safeequal",
@@ -247,7 +295,7 @@
       "file_type": "code",
       "norm_label": "safeequal()",
       "source_file": "server/server.js",
-      "source_location": "L205"
+      "source_location": "L214"
     },
     {
       "id": "server_server_start",
@@ -259,55 +307,103 @@
       "file_type": "code",
       "norm_label": "start()",
       "source_file": "server/server.js",
-      "source_location": "L1491"
+      "source_location": "L1670"
     },
     {
-      "id": "client_app_askconfirm",
+      "id": "client_ui_askconfirm",
       "label": "askConfirm()",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
-      "community_name": "Client App Logic",
+      "community": 19,
+      "community_name": "ui.js",
       "file_type": "code",
       "norm_label": "askconfirm()",
-      "source_file": "client/app.js",
-      "source_location": "L875"
+      "source_file": "client/ui.js",
+      "source_location": "L68"
     },
     {
-      "id": "client_app_closeconfirm",
+      "id": "client_ui_closeconfirm",
       "label": "closeConfirm()",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
-      "community_name": "Client App Logic",
+      "community": 19,
+      "community_name": "ui.js",
       "file_type": "code",
       "norm_label": "closeconfirm()",
-      "source_file": "client/app.js",
-      "source_location": "L883"
+      "source_file": "client/ui.js",
+      "source_location": "L77"
     },
     {
-      "id": "client_app_copyphone",
+      "id": "client_ui_copyphone",
       "label": "copyPhone()",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
-      "community_name": "Client App Logic",
+      "community": 19,
+      "community_name": "ui.js",
       "file_type": "code",
       "norm_label": "copyphone()",
-      "source_file": "client/app.js",
-      "source_location": "L611"
+      "source_file": "client/ui.js",
+      "source_location": "L94"
     },
     {
-      "id": "client_app_escattr",
+      "id": "client_ui_escattr",
       "label": "escAttr()",
       "_callable": true,
       "_origin": "ast",
-      "community": 2,
-      "community_name": "Client App Logic",
+      "community": 19,
+      "community_name": "ui.js",
       "file_type": "code",
       "norm_label": "escattr()",
-      "source_file": "client/app.js",
-      "source_location": "L602"
+      "source_file": "client/ui.js",
+      "source_location": "L28"
+    },
+    {
+      "id": "client_ui_hideformmsg",
+      "label": "hideFormMsg()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 19,
+      "community_name": "ui.js",
+      "file_type": "code",
+      "norm_label": "hideformmsg()",
+      "source_file": "client/ui.js",
+      "source_location": "L46"
+    },
+    {
+      "id": "client_ui_initconfirmmodal",
+      "label": "initConfirmModal()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 19,
+      "community_name": "ui.js",
+      "file_type": "code",
+      "norm_label": "initconfirmmodal()",
+      "source_file": "client/ui.js",
+      "source_location": "L85"
+    },
+    {
+      "id": "client_ui_showformmsg",
+      "label": "showFormMsg()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 19,
+      "community_name": "ui.js",
+      "file_type": "code",
+      "norm_label": "showformmsg()",
+      "source_file": "client/ui.js",
+      "source_location": "L36"
+    },
+    {
+      "id": "client_ui_toast",
+      "label": "toast()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 19,
+      "community_name": "ui.js",
+      "file_type": "code",
+      "norm_label": "toast()",
+      "source_file": "client/ui.js",
+      "source_location": "L50"
     },
     {
       "id": "client_app_flytocart",
@@ -315,47 +411,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "flytocart()",
       "source_file": "client/app.js",
-      "source_location": "L809"
-    },
-    {
-      "id": "client_app_hideformmsg",
-      "label": "hideFormMsg()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Client App Logic",
-      "file_type": "code",
-      "norm_label": "hideformmsg()",
-      "source_file": "client/app.js",
-      "source_location": "L853"
-    },
-    {
-      "id": "client_app_initadminforms",
-      "label": "initAdminForms()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Client App Logic",
-      "file_type": "code",
-      "norm_label": "initadminforms()",
-      "source_file": "client/app.js",
-      "source_location": "L1062"
-    },
-    {
-      "id": "client_app_initconfirmmodal",
-      "label": "initConfirmModal()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Client App Logic",
-      "file_type": "code",
-      "norm_label": "initconfirmmodal()",
-      "source_file": "client/app.js",
-      "source_location": "L891"
+      "source_location": "L740"
     },
     {
       "id": "client_app_inithamburger",
@@ -363,11 +423,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "inithamburger()",
       "source_file": "client/app.js",
-      "source_location": "L909"
+      "source_location": "L785"
     },
     {
       "id": "client_app_inithamburger_closemenu",
@@ -375,11 +435,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "closemenu()",
       "source_file": "client/app.js",
-      "source_location": "L915"
+      "source_location": "L791"
     },
     {
       "id": "client_app_inithamburger_togglemenu",
@@ -387,23 +447,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "togglemenu()",
       "source_file": "client/app.js",
-      "source_location": "L921"
-    },
-    {
-      "id": "client_app_initloginmodal",
-      "label": "initLoginModal()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Client App Logic",
-      "file_type": "code",
-      "norm_label": "initloginmodal()",
-      "source_file": "client/app.js",
-      "source_location": "L950"
+      "source_location": "L797"
     },
     {
       "id": "client_app_isvaliddzphone",
@@ -411,11 +459,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "isvaliddzphone()",
       "source_file": "client/app.js",
-      "source_location": "L596"
+      "source_location": "L559"
     },
     {
       "id": "client_app_normalizedzphone",
@@ -423,35 +471,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "normalizedzphone()",
       "source_file": "client/app.js",
-      "source_location": "L590"
-    },
-    {
-      "id": "client_app_showformmsg",
-      "label": "showFormMsg()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Client App Logic",
-      "file_type": "code",
-      "norm_label": "showformmsg()",
-      "source_file": "client/app.js",
-      "source_location": "L843"
-    },
-    {
-      "id": "client_app_toast",
-      "label": "toast()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Client App Logic",
-      "file_type": "code",
-      "norm_label": "toast()",
-      "source_file": "client/app.js",
-      "source_location": "L857"
+      "source_location": "L553"
     },
     {
       "id": "opencode_plugins_graphify_auto_graphifyauto",
@@ -466,40 +490,28 @@
       "source_location": "L5"
     },
     {
-      "id": "client_validators_isvaliddzphone",
-      "label": "isValidDZPhone()",
+      "id": "client_admin_app_initadminforms",
+      "label": "initAdminForms()",
       "_callable": true,
       "_origin": "ast",
       "community": 33,
-      "community_name": "validators.js",
+      "community_name": "admin-app.js",
       "file_type": "code",
-      "norm_label": "isvaliddzphone()",
-      "source_file": "client/validators.js",
-      "source_location": "L23"
+      "norm_label": "initadminforms()",
+      "source_file": "client/admin-app.js",
+      "source_location": "L112"
     },
     {
-      "id": "client_validators_isvalidemail",
-      "label": "isValidEmail()",
+      "id": "client_admin_app_initloginmodal",
+      "label": "initLoginModal()",
       "_callable": true,
       "_origin": "ast",
       "community": 33,
-      "community_name": "validators.js",
+      "community_name": "admin-app.js",
       "file_type": "code",
-      "norm_label": "isvalidemail()",
-      "source_file": "client/validators.js",
-      "source_location": "L27"
-    },
-    {
-      "id": "client_validators_normalizedzphone",
-      "label": "normalizeDZPhone()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 33,
-      "community_name": "validators.js",
-      "file_type": "code",
-      "norm_label": "normalizedzphone()",
-      "source_file": "client/validators.js",
-      "source_location": "L19"
+      "norm_label": "initloginmodal()",
+      "source_file": "client/admin-app.js",
+      "source_location": "L7"
     },
     {
       "id": "server_config_mailer_gettransporter",
@@ -538,6 +550,17 @@
       "source_location": "L23"
     },
     {
+      "id": "client_validators",
+      "label": "validators.js",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "server.js",
+      "file_type": "code",
+      "norm_label": "validators.js",
+      "source_file": "client/validators.js",
+      "source_location": "L1"
+    },
+    {
       "id": "server_server",
       "label": "server.js",
       "_origin": "ast",
@@ -568,7 +591,7 @@
       "file_type": "code",
       "norm_label": "authlimiter",
       "source_file": "server/server.js",
-      "source_location": "L61"
+      "source_location": "L70"
     },
     {
       "id": "server_server_bcrypt",
@@ -645,7 +668,7 @@
       "file_type": "code",
       "norm_label": "forgotlimiter",
       "source_file": "server/server.js",
-      "source_location": "L69"
+      "source_location": "L78"
     },
     {
       "id": "server_server_fs",
@@ -667,7 +690,7 @@
       "file_type": "code",
       "norm_label": "generallimiter",
       "source_file": "server/server.js",
-      "source_location": "L43"
+      "source_location": "L52"
     },
     {
       "id": "server_server_multer",
@@ -689,7 +712,7 @@
       "file_type": "code",
       "norm_label": "orderlimiter",
       "source_file": "server/server.js",
-      "source_location": "L52"
+      "source_location": "L61"
     },
     {
       "id": "server_server_password_min_normalizedzphone_isvaliddzphone_isvalidemail",
@@ -744,7 +767,7 @@
       "file_type": "code",
       "norm_label": "sessions",
       "source_file": "server/server.js",
-      "source_location": "L112"
+      "source_location": "L121"
     },
     {
       "id": "server_server_storage",
@@ -755,7 +778,7 @@
       "file_type": "code",
       "norm_label": "storage",
       "source_file": "server/server.js",
-      "source_location": "L91"
+      "source_location": "L100"
     },
     {
       "id": "server_server_toomanymsg",
@@ -766,7 +789,7 @@
       "file_type": "code",
       "norm_label": "toomanymsg",
       "source_file": "server/server.js",
-      "source_location": "L41"
+      "source_location": "L50"
     },
     {
       "id": "server_server_tracklimiter",
@@ -777,7 +800,7 @@
       "file_type": "code",
       "norm_label": "tracklimiter",
       "source_file": "server/server.js",
-      "source_location": "L78"
+      "source_location": "L87"
     },
     {
       "id": "server_server_upload",
@@ -788,7 +811,7 @@
       "file_type": "code",
       "norm_label": "upload",
       "source_file": "server/server.js",
-      "source_location": "L98"
+      "source_location": "L107"
     },
     {
       "id": "server_server_uploadsdir",
@@ -802,15 +825,15 @@
       "source_location": "L22"
     },
     {
-      "id": "server_server_rationale_921",
-      "label": "NOTE: orders are never deleted \u2014 delivered history accumulates forever,",
+      "id": "server_server_rationale_937",
+      "label": "NOTE: delivered orders live 24h (grace), then aggregate into",
       "_origin": "ast",
       "community": 1,
       "community_name": "server.js",
       "file_type": "rationale",
-      "norm_label": "note: orders are never deleted \u2014 delivered history accumulates forever,",
+      "norm_label": "note: delivered orders live 24h (grace), then aggregate into",
       "source_file": "server/server.js",
-      "source_location": "L921"
+      "source_location": "L937"
     },
     {
       "id": "agents_skills_anti_koshary_scripts_dep_audit",
@@ -939,7 +962,7 @@
       "source_location": "L4"
     },
     {
-      "id": "client_sw_rationale_42",
+      "id": "client_sw_rationale_44",
       "label": "NOTE: every other /api/* request (auth, orders, zones, staff, reviews,",
       "_origin": "ast",
       "community": 13,
@@ -947,7 +970,7 @@
       "file_type": "rationale",
       "norm_label": "note: every other /api/* request (auth, orders, zones, staff, reviews,",
       "source_file": "client/sw.js",
-      "source_location": "L42"
+      "source_location": "L44"
     },
     {
       "id": "client_admin",
@@ -1064,7 +1087,7 @@
       "label": "ui.js",
       "_origin": "ast",
       "community": 19,
-      "community_name": "UI Module",
+      "community_name": "ui.js",
       "file_type": "code",
       "norm_label": "ui.js",
       "source_file": "client/ui.js",
@@ -1075,7 +1098,7 @@
       "label": "UI",
       "_origin": "ast",
       "community": 19,
-      "community_name": "UI Module",
+      "community_name": "ui.js",
       "file_type": "code",
       "norm_label": "ui",
       "source_file": "client/ui.js",
@@ -1086,7 +1109,7 @@
       "label": "app.js",
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "app.js",
       "source_file": "client/app.js",
@@ -1097,7 +1120,7 @@
       "label": "API",
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "api",
       "source_file": "client/app.js",
@@ -1108,7 +1131,7 @@
       "label": "AppState",
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "appstate",
       "source_file": "client/app.js",
@@ -1119,62 +1142,62 @@
       "label": "CartBadge",
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "cartbadge",
       "source_file": "client/app.js",
-      "source_location": "L191"
+      "source_location": "L154"
     },
     {
       "id": "client_app_cartpage",
       "label": "CartPage",
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "cartpage",
       "source_file": "client/app.js",
-      "source_location": "L533"
+      "source_location": "L496"
     },
     {
       "id": "client_app_checkout",
       "label": "Checkout",
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "checkout",
       "source_file": "client/app.js",
-      "source_location": "L672"
+      "source_location": "L603"
     },
     {
       "id": "client_app_customizer",
       "label": "Customizer",
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "customizer",
       "source_file": "client/app.js",
-      "source_location": "L375"
+      "source_location": "L338"
     },
     {
       "id": "client_app_menudisplay",
       "label": "MenuDisplay",
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "menudisplay",
       "source_file": "client/app.js",
-      "source_location": "L207"
+      "source_location": "L170"
     },
     {
       "id": "client_app_router",
       "label": "Router",
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "router",
       "source_file": "client/app.js",
@@ -1185,7 +1208,7 @@
       "label": "ScrollReveal",
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "scrollreveal",
       "source_file": "client/app.js",
@@ -1196,22 +1219,33 @@
       "label": "ThemeManager",
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "thememanager",
       "source_file": "client/app.js",
-      "source_location": "L173"
+      "source_location": "L136"
     },
     {
       "id": "client_app_zones",
       "label": "Zones",
       "_origin": "ast",
       "community": 2,
-      "community_name": "Client App Logic",
+      "community_name": "app.js",
       "file_type": "code",
       "norm_label": "zones",
       "source_file": "client/app.js",
-      "source_location": "L637"
+      "source_location": "L568"
+    },
+    {
+      "id": "client_app_rationale_98",
+      "label": "NOTE: staff/admin dashboards and password-reset live on /admin now.",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "app.js",
+      "file_type": "rationale",
+      "norm_label": "note: staff/admin dashboards and password-reset live on /admin now.",
+      "source_file": "client/app.js",
+      "source_location": "L98"
     },
     {
       "id": "opencode_skills_graphify_skill_part_a_structural_extraction_for_code_files",
@@ -2306,15 +2340,26 @@
       "source_location": "L6"
     },
     {
-      "id": "client_validators",
-      "label": "validators.js",
+      "id": "client_admin_app",
+      "label": "admin-app.js",
       "_origin": "ast",
       "community": 33,
-      "community_name": "validators.js",
+      "community_name": "admin-app.js",
       "file_type": "code",
-      "norm_label": "validators.js",
-      "source_file": "client/validators.js",
+      "norm_label": "admin-app.js",
+      "source_file": "client/admin-app.js",
       "source_location": "L1"
+    },
+    {
+      "id": "client_admin_app_admingate",
+      "label": "AdminGate",
+      "_origin": "ast",
+      "community": 33,
+      "community_name": "admin-app.js",
+      "file_type": "code",
+      "norm_label": "admingate",
+      "source_file": "client/admin-app.js",
+      "source_location": "L175"
     },
     {
       "id": "server_package_dependencies",
@@ -3609,54 +3654,6 @@
       "weight": 1.0
     },
     {
-      "source": "client_app_copyphone",
-      "target": "client_app_toast",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "client/app.js",
-      "source_location": "L616",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app_initconfirmmodal",
-      "target": "client_app_closeconfirm",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "client/app.js",
-      "source_location": "L892",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app_initloginmodal",
-      "target": "client_app_hideformmsg",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "client/app.js",
-      "source_location": "L954",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app_initloginmodal",
-      "target": "client_app_showformmsg",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "client/app.js",
-      "source_location": "L964",
-      "weight": 1.0
-    },
-    {
       "source": "client_app_isvaliddzphone",
       "target": "client_app_isvaliddzphone",
       "relation": "calls",
@@ -3665,7 +3662,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "client/app.js",
-      "source_location": "L598",
+      "source_location": "L561",
       "weight": 1.0
     },
     {
@@ -3677,7 +3674,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "client/app.js",
-      "source_location": "L599",
+      "source_location": "L562",
       "weight": 1.0
     },
     {
@@ -3689,7 +3686,31 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "client/app.js",
-      "source_location": "L592",
+      "source_location": "L555",
+      "weight": 1.0
+    },
+    {
+      "source": "client_ui_copyphone",
+      "target": "client_ui_toast",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "client/ui.js",
+      "source_location": "L99",
+      "weight": 1.0
+    },
+    {
+      "source": "client_ui_initconfirmmodal",
+      "target": "client_ui_closeconfirm",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "client/ui.js",
+      "source_location": "L89",
       "weight": 1.0
     },
     {
@@ -3737,7 +3758,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/server.js",
-      "source_location": "L134",
+      "source_location": "L143",
       "weight": 1.0
     },
     {
@@ -3749,7 +3770,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/server.js",
-      "source_location": "L149",
+      "source_location": "L158",
       "weight": 1.0
     },
     {
@@ -3761,7 +3782,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/server.js",
-      "source_location": "L1492",
+      "source_location": "L1671",
       "weight": 1.0
     },
     {
@@ -3773,7 +3794,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "server/server.js",
-      "source_location": "L1493",
+      "source_location": "L1672",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server_start",
+      "target": "server_server_purgedeliveredorders",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "server/server.js",
+      "source_location": "L1673",
       "weight": 1.0
     },
     {
@@ -3882,6 +3915,54 @@
       "context": "import",
       "source_file": "server/package.json",
       "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
+      "target": "server_config_mailer_sendpasswordresetemail",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "server/server.js",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
+      "target": "client_validators_isvaliddzphone",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "server/server.js",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
+      "target": "client_validators_isvalidemail",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "server/server.js",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
+      "target": "client_validators_normalizedzphone",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "server/server.js",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -4060,14 +4141,58 @@
       "weight": 1.0
     },
     {
+      "source": "client_admin_app",
+      "target": "client_admin_app_initadminforms",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/admin-app.js",
+      "source_location": "L112",
+      "weight": 1.0
+    },
+    {
+      "source": "client_admin_app",
+      "target": "client_admin_app_admingate",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/admin-app.js",
+      "source_location": "L175",
+      "weight": 1.0
+    },
+    {
+      "source": "client_admin_app",
+      "target": "client_admin_app_initloginmodal",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/admin-app.js",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
       "source": "client_app",
-      "target": "client_app_initadminforms",
+      "target": "client_app_thememanager",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/app.js",
-      "source_location": "L1062",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
+      "source": "client_app",
+      "target": "client_app_cartbadge",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/app.js",
+      "source_location": "L154",
       "weight": 1.0
     },
     {
@@ -4083,35 +4208,13 @@
     },
     {
       "source": "client_app",
-      "target": "client_app_thememanager",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/app.js",
-      "source_location": "L173",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app",
-      "target": "client_app_cartbadge",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/app.js",
-      "source_location": "L191",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app",
       "target": "client_app_menudisplay",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/app.js",
-      "source_location": "L207",
+      "source_location": "L170",
       "weight": 1.0
     },
     {
@@ -4122,7 +4225,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/app.js",
-      "source_location": "L375",
+      "source_location": "L338",
       "weight": 1.0
     },
     {
@@ -4138,6 +4241,17 @@
     },
     {
       "source": "client_app",
+      "target": "client_app_cartpage",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/app.js",
+      "source_location": "L496",
+      "weight": 1.0
+    },
+    {
+      "source": "client_app",
       "target": "client_app_api",
       "relation": "contains",
       "_origin": "ast",
@@ -4149,24 +4263,13 @@
     },
     {
       "source": "client_app",
-      "target": "client_app_cartpage",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/app.js",
-      "source_location": "L533",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app",
       "target": "client_app_normalizedzphone",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/app.js",
-      "source_location": "L590",
+      "source_location": "L553",
       "weight": 1.0
     },
     {
@@ -4177,29 +4280,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/app.js",
-      "source_location": "L596",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app",
-      "target": "client_app_escattr",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/app.js",
-      "source_location": "L602",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app",
-      "target": "client_app_copyphone",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/app.js",
-      "source_location": "L611",
+      "source_location": "L559",
       "weight": 1.0
     },
     {
@@ -4210,7 +4291,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/app.js",
-      "source_location": "L637",
+      "source_location": "L568",
+      "weight": 1.0
+    },
+    {
+      "source": "client_app",
+      "target": "client_app_checkout",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/app.js",
+      "source_location": "L603",
       "weight": 1.0
     },
     {
@@ -4226,90 +4318,13 @@
     },
     {
       "source": "client_app",
-      "target": "client_app_checkout",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/app.js",
-      "source_location": "L672",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app",
       "target": "client_app_flytocart",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/app.js",
-      "source_location": "L809",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app",
-      "target": "client_app_showformmsg",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/app.js",
-      "source_location": "L843",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app",
-      "target": "client_app_hideformmsg",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/app.js",
-      "source_location": "L853",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app",
-      "target": "client_app_toast",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/app.js",
-      "source_location": "L857",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app",
-      "target": "client_app_askconfirm",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/app.js",
-      "source_location": "L875",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app",
-      "target": "client_app_closeconfirm",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/app.js",
-      "source_location": "L883",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app",
-      "target": "client_app_initconfirmmodal",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/app.js",
-      "source_location": "L891",
+      "source_location": "L740",
       "weight": 1.0
     },
     {
@@ -4320,18 +4335,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/app.js",
-      "source_location": "L909",
-      "weight": 1.0
-    },
-    {
-      "source": "client_app",
-      "target": "client_app_initloginmodal",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "client/app.js",
-      "source_location": "L950",
+      "source_location": "L785",
       "weight": 1.0
     },
     {
@@ -4435,6 +4439,28 @@
     },
     {
       "source": "client_ui",
+      "target": "client_ui_escattr",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/ui.js",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "client_ui",
+      "target": "client_ui_showformmsg",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/ui.js",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "client_ui",
       "target": "client_ui_ui",
       "relation": "contains",
       "_origin": "ast",
@@ -4442,6 +4468,72 @@
       "confidence_score": 1.0,
       "source_file": "client/ui.js",
       "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "client_ui",
+      "target": "client_ui_hideformmsg",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/ui.js",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "client_ui",
+      "target": "client_ui_toast",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/ui.js",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "client_ui",
+      "target": "client_ui_askconfirm",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/ui.js",
+      "source_location": "L68",
+      "weight": 1.0
+    },
+    {
+      "source": "client_ui",
+      "target": "client_ui_closeconfirm",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/ui.js",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "client_ui",
+      "target": "client_ui_initconfirmmodal",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/ui.js",
+      "source_location": "L85",
+      "weight": 1.0
+    },
+    {
+      "source": "client_ui",
+      "target": "client_ui_copyphone",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/ui.js",
+      "source_location": "L94",
       "weight": 1.0
     },
     {
@@ -5370,13 +5462,46 @@
     },
     {
       "source": "server_server",
+      "target": "server_server_storage",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/server.js",
+      "source_location": "L100",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
+      "target": "server_server_upload",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/server.js",
+      "source_location": "L107",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
+      "target": "server_server_attachoptions",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/server.js",
+      "source_location": "L1071",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
       "target": "server_server_attachratings",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
-      "source_location": "L1011",
+      "source_location": "L1084",
       "weight": 1.0
     },
     {
@@ -5398,7 +5523,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
-      "source_location": "L112",
+      "source_location": "L121",
       "weight": 1.0
     },
     {
@@ -5409,7 +5534,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
-      "source_location": "L114",
+      "source_location": "L123",
       "weight": 1.0
     },
     {
@@ -5420,7 +5545,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
-      "source_location": "L119",
+      "source_location": "L128",
       "weight": 1.0
     },
     {
@@ -5431,7 +5556,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
-      "source_location": "L1262",
+      "source_location": "L1335",
       "weight": 1.0
     },
     {
@@ -5453,29 +5578,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
-      "source_location": "L1462",
-      "weight": 1.0
-    },
-    {
-      "source": "server_server",
-      "target": "server_server_start",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "server/server.js",
-      "source_location": "L1491",
-      "weight": 1.0
-    },
-    {
-      "source": "server_server",
-      "target": "server_server_invalidateusersessions",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "server/server.js",
-      "source_location": "L159",
+      "source_location": "L1576",
       "weight": 1.0
     },
     {
@@ -5491,18 +5594,40 @@
     },
     {
       "source": "server_server",
-      "target": "server_server_getclientip",
+      "target": "server_server_purgedeliveredorders",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
-      "source_location": "L174",
+      "source_location": "L1608",
       "weight": 1.0
     },
     {
       "source": "server_server",
-      "target": "server_server_maskname",
+      "target": "server_server_start",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/server.js",
+      "source_location": "L1670",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
+      "target": "server_server_invalidateusersessions",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/server.js",
+      "source_location": "L168",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
+      "target": "server_server_getclientip",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -5513,24 +5638,13 @@
     },
     {
       "source": "server_server",
-      "target": "server_server_maskaddress",
+      "target": "server_server_maskname",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
-      "source_location": "L191",
-      "weight": 1.0
-    },
-    {
-      "source": "server_server",
-      "target": "server_server_maskphone",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "server/server.js",
-      "source_location": "L197",
+      "source_location": "L192",
       "weight": 1.0
     },
     {
@@ -5546,13 +5660,24 @@
     },
     {
       "source": "server_server",
-      "target": "server_server_safeequal",
+      "target": "server_server_maskaddress",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
-      "source_location": "L205",
+      "source_location": "L200",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
+      "target": "server_server_maskphone",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/server.js",
+      "source_location": "L206",
       "weight": 1.0
     },
     {
@@ -5568,13 +5693,13 @@
     },
     {
       "source": "server_server",
-      "target": "server_server_isaccountlocked",
+      "target": "server_server_safeequal",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
-      "source_location": "L215",
+      "source_location": "L214",
       "weight": 1.0
     },
     {
@@ -5590,13 +5715,24 @@
     },
     {
       "source": "server_server",
+      "target": "server_server_isaccountlocked",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/server.js",
+      "source_location": "L224",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
       "target": "server_server_isipbanned",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
-      "source_location": "L226",
+      "source_location": "L235",
       "weight": 1.0
     },
     {
@@ -5607,7 +5743,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
-      "source_location": "L236",
+      "source_location": "L245",
       "weight": 1.0
     },
     {
@@ -5634,28 +5770,6 @@
     },
     {
       "source": "server_server",
-      "target": "server_server_toomanymsg",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "server/server.js",
-      "source_location": "L41",
-      "weight": 1.0
-    },
-    {
-      "source": "server_server",
-      "target": "server_server_generallimiter",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "server/server.js",
-      "source_location": "L43",
-      "weight": 1.0
-    },
-    {
-      "source": "server_server",
       "target": "server_server_multer",
       "relation": "contains",
       "_origin": "ast",
@@ -5667,7 +5781,18 @@
     },
     {
       "source": "server_server",
-      "target": "server_server_orderlimiter",
+      "target": "server_server_toomanymsg",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/server.js",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
+      "target": "server_server_generallimiter",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -5689,24 +5814,13 @@
     },
     {
       "source": "server_server",
-      "target": "server_server_authlimiter",
+      "target": "server_server_orderlimiter",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
       "source_location": "L61",
-      "weight": 1.0
-    },
-    {
-      "source": "server_server",
-      "target": "server_server_forgotlimiter",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "server/server.js",
-      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -5722,7 +5836,18 @@
     },
     {
       "source": "server_server",
-      "target": "server_server_tracklimiter",
+      "target": "server_server_authlimiter",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/server.js",
+      "source_location": "L70",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
+      "target": "server_server_forgotlimiter",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -5744,6 +5869,17 @@
     },
     {
       "source": "server_server",
+      "target": "server_server_tracklimiter",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/server.js",
+      "source_location": "L87",
+      "weight": 1.0
+    },
+    {
+      "source": "server_server",
       "target": "server_server_ratelimit",
       "relation": "contains",
       "_origin": "ast",
@@ -5751,39 +5887,6 @@
       "confidence_score": 1.0,
       "source_file": "server/server.js",
       "source_location": "L9",
-      "weight": 1.0
-    },
-    {
-      "source": "server_server",
-      "target": "server_server_storage",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "server/server.js",
-      "source_location": "L91",
-      "weight": 1.0
-    },
-    {
-      "source": "server_server",
-      "target": "server_server_upload",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "server/server.js",
-      "source_location": "L98",
-      "weight": 1.0
-    },
-    {
-      "source": "server_server",
-      "target": "server_server_attachoptions",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "server/server.js",
-      "source_location": "L998",
       "weight": 1.0
     },
     {
@@ -5809,25 +5912,36 @@
       "weight": 1.0
     },
     {
-      "source": "client_sw_rationale_42",
+      "source": "client_app_rationale_98",
+      "target": "client_app",
+      "relation": "rationale_for",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/app.js",
+      "source_location": "L98",
+      "weight": 1.0
+    },
+    {
+      "source": "client_sw_rationale_44",
       "target": "client_sw",
       "relation": "rationale_for",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "client/sw.js",
-      "source_location": "L42",
+      "source_location": "L44",
       "weight": 1.0
     },
     {
-      "source": "server_server_rationale_921",
+      "source": "server_server_rationale_937",
       "target": "server_server",
       "relation": "rationale_for",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "server/server.js",
-      "source_location": "L921",
+      "source_location": "L937",
       "weight": 1.0
     },
     {
@@ -5839,7 +5953,7 @@
       "confidence_score": 0.85,
       "context": "argument",
       "source_file": "client/app.js",
-      "source_location": "L927",
+      "source_location": "L803",
       "weight": 1.0
     },
     {
@@ -5851,7 +5965,7 @@
       "confidence_score": 0.85,
       "context": "argument",
       "source_file": "client/app.js",
-      "source_location": "L931",
+      "source_location": "L807",
       "weight": 1.0
     },
     {
@@ -5863,7 +5977,7 @@
       "confidence_score": 0.85,
       "context": "argument",
       "source_file": "server/server.js",
-      "source_location": "L415",
+      "source_location": "L424",
       "weight": 1.0
     },
     {
@@ -5875,7 +5989,7 @@
       "confidence_score": 0.85,
       "context": "argument",
       "source_file": "server/server.js",
-      "source_location": "L439",
+      "source_location": "L448",
       "weight": 1.0
     },
     {
@@ -6846,5 +6960,5 @@
       "source_file": "client/imgs/3fromages.jpg"
     }
   ],
-  "built_at_commit": "7d37a8b49411cfe787ba06bba639eb575ac75cb7"
+  "built_at_commit": "40154ece99c0ebb5e100d436b9b95fa15435b9bd"
 }

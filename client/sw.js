@@ -1,16 +1,18 @@
 // Delicious Restaurant — offline-first service worker (no build step).
 // App shell cached on install; menu API cached at runtime; orders/auth always network.
-const CACHE = 'delicious-v6';
+const CACHE = 'delicious-v7';
 const SHELL = [
   './',
   './index.html',
-  './styles.css?v=6',
-  './app.js?v=6',
+  './admin.html',
+  './styles.css?v=7',
+  './app.js?v=7',
   './cart.js',
   './auth.js',
   './ui.js',
   './staff.js',
-  './admin.js?v=6',
+  './admin.js',
+  './admin-app.js',
   './track.js',
   './i18n.js',
   './icons.js',

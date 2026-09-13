@@ -33,6 +33,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(clientDir));
 app.use('/uploads', express.static(uploadsDir));
 
+// Staff & admin page (separate from the client ordering page).
+// Served as a static file; authentication happens via the existing
+// /api/auth/* endpoints (httpOnly cookie) + AdminGate in admin-app.js,
+// while every admin API stays behind requireAdmin — so downloading this
+// page grants nothing without a staff/admin session.
+app.get(['/admin', '/admin/'], (req, res) => {
+    res.sendFile(path.join(clientDir, 'admin.html'));
+});
+
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
 // ============================================
@@ -359,7 +368,7 @@ app.post('/api/auth/forgot-password', forgotLimiter, async (req, res) => {
         await db.query('UPDATE staff SET reset_token = ?, reset_expires = ? WHERE id = ?', [token, expires, user.id]);
 
         const appUrl = (process.env.APP_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
-        const resetUrl = `${appUrl}/#reset-password?token=${token}`;
+        const resetUrl = `${appUrl}/admin#reset-password?token=${token}`;
 
         try {
             const result = await sendPasswordResetEmail(user.email, user.full_name, resetUrl);
@@ -712,7 +721,8 @@ app.get('/api/orders/track', trackLimiter, async (req, res) => {
 app.get('/api/orders', authenticateToken, async (req, res) => {
     try {
         // Keyset pagination: ?limit= (default 200, max 1000), ?before=<id>.
-        // Orders are never deleted, so an unbounded SELECT would grow forever.
+        // Delivered orders purge 24h after delivery (see purgeDeliveredOrders),
+        // but active orders still accumulate, so an unbounded SELECT is unsafe.
         let limit = parseInt(req.query.limit, 10);
         if (!Number.isFinite(limit) || limit <= 0) limit = 200;
         limit = Math.min(1000, limit);
@@ -756,7 +766,14 @@ app.patch('/api/orders/:id/status', authenticateToken, async (req, res) => {
         if (!validStatuses.includes(status)) {
             return res.status(400).json({ success: false, message: 'Invalid status' });
         }
-        await db.query('UPDATE orders SET status = ? WHERE id = ?', [status, req.params.id]);
+        // Delivered starts a 24h grace clock (delivered_at): the hourly purge
+        // aggregates purged orders into delivery_stats, then hard-deletes
+        // them (PII minimization). Moving away from delivered clears the clock.
+        if (status === 'delivered') {
+            await db.query('UPDATE orders SET status = ?, delivered_at = NOW() WHERE id = ?', [status, req.params.id]);
+        } else {
+            await db.query('UPDATE orders SET status = ?, delivered_at = NULL WHERE id = ?', [status, req.params.id]);
+        }
         res.json({ success: true, message: 'Status updated' });
     } catch (error) {
         console.error('Error updating order status:', error);
@@ -918,8 +935,9 @@ app.delete('/api/zones/:id', requireAdmin, async (req, res) => {
 
 // ============================================
 // Analytics (admin only)
-// NOTE: orders are never deleted — delivered history accumulates forever,
-// which is what powers the day-by-day comparisons below.
+// NOTE: delivered orders live 24h (grace), then aggregate into
+// delivery_stats and hard-delete (PII minimization). All lifetime and
+// per-day figures below merge active rows + purged aggregates.
 // GET /api/analytics?days=14 (7..90)
 // ============================================
 app.get('/api/analytics', requireAdmin, async (req, res) => {
@@ -928,32 +946,89 @@ app.get('/api/analytics', requireAdmin, async (req, res) => {
         if (!Number.isFinite(days)) days = 14;
         days = Math.min(90, Math.max(7, days));
 
-        const [[totals]] = await db.query(
+        // Lifetime totals: active rows + purged history.
+        const [[active]] = await db.query(
             `SELECT COUNT(*) AS orders, COALESCE(SUM(total), 0) AS revenue,
                     COALESCE(AVG(total), 0) AS avgOrder,
                     SUM(status = 'delivered') AS deliveredOrders,
                     COALESCE(SUM(CASE WHEN status = 'delivered' THEN total ELSE 0 END), 0) AS deliveredRevenue
              FROM orders`
         );
+        const [[purged]] = await db.query(
+            `SELECT COALESCE(SUM(placed_count), 0) AS orders,
+                    COALESCE(SUM(placed_revenue), 0) AS revenue,
+                    COALESCE(SUM(delivered_count), 0) AS deliveredOrders,
+                    COALESCE(SUM(delivered_revenue), 0) AS deliveredRevenue
+             FROM delivery_stats`
+        );
+        const totalOrders = Number(active.orders) + Number(purged.orders);
+        const totalRevenue = Number(active.revenue) + Number(purged.revenue);
+        const totals = {
+            orders: totalOrders,
+            revenue: totalRevenue,
+            avgOrder: totalOrders ? totalRevenue / totalOrders : 0,
+            deliveredOrders: Number(active.deliveredOrders) + Number(purged.deliveredOrders),
+            deliveredRevenue: Number(active.deliveredRevenue) + Number(purged.deliveredRevenue)
+        };
         const [byStatus] = await db.query(
             'SELECT status, COUNT(*) AS count, COALESCE(SUM(total), 0) AS revenue FROM orders GROUP BY status'
         );
-        // Current window, per day (fills only days that have orders)
-        const [byDay] = await db.query(
-            `SELECT DATE(created_at) AS day, COUNT(*) AS orders, COALESCE(SUM(total), 0) AS revenue,
-                    SUM(status = 'delivered') AS delivered
+        // Placed per created-day: active rows + purged aggregates.
+        const [byDayActive] = await db.query(
+            `SELECT DATE(created_at) AS day, COUNT(*) AS orders, COALESCE(SUM(total), 0) AS revenue
              FROM orders WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
              GROUP BY DATE(created_at) ORDER BY day ASC`,
             [days - 1]
         );
-        // Previous window of equal length, for comparison
-        const [[prev]] = await db.query(
+        // Delivered per delivery-day: in-grace rows + purged aggregates.
+        const [byDayDelivered] = await db.query(
+            `SELECT DATE(COALESCE(delivered_at, created_at)) AS day, COUNT(*) AS delivered
+             FROM orders WHERE status = 'delivered'
+               AND COALESCE(delivered_at, created_at) >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+             GROUP BY DATE(COALESCE(delivered_at, created_at))`,
+            [days - 1]
+        );
+        // Purged aggregates covering the current + previous windows.
+        const [statsDays] = await db.query(
+            `SELECT day, placed_count, placed_revenue, delivered_count FROM delivery_stats
+             WHERE day >= DATE_SUB(CURDATE(), INTERVAL ? DAY)`,
+            [days * 2 - 1]
+        );
+        const dayKey = (d) => (d instanceof Date ? d.toISOString().slice(0, 10) : String(d).slice(0, 10));
+        const placed = new Map();
+        for (const r of byDayActive) placed.set(dayKey(r.day), { orders: Number(r.orders), revenue: Number(r.revenue) });
+        const deliveredPerDay = new Map();
+        for (const r of byDayDelivered) deliveredPerDay.set(dayKey(r.day), Number(r.delivered));
+        for (const r of statsDays) {
+            const k = dayKey(r.day);
+            const p = placed.get(k) || { orders: 0, revenue: 0 };
+            p.orders += Number(r.placed_count);
+            p.revenue += Number(r.placed_revenue);
+            placed.set(k, p);
+            deliveredPerDay.set(k, (deliveredPerDay.get(k) || 0) + Number(r.delivered_count));
+        }
+        // Previous window of equal length, for comparison (active + purged).
+        const [[prevActive]] = await db.query(
             `SELECT COUNT(*) AS orders, COALESCE(SUM(total), 0) AS revenue
              FROM orders
              WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
                AND created_at < DATE_SUB(CURDATE(), INTERVAL ? DAY)`,
             [days * 2 - 1, days]
         );
+        const [[prevStats]] = await db.query(
+            `SELECT COALESCE(SUM(placed_count), 0) AS orders,
+                    COALESCE(SUM(placed_revenue), 0) AS revenue
+             FROM delivery_stats
+             WHERE day >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+               AND day < DATE_SUB(CURDATE(), INTERVAL ? DAY)`,
+            [days * 2 - 1, days]
+        );
+        const prev = {
+            orders: Number(prevActive.orders) + Number(prevStats.orders),
+            revenue: Number(prevActive.revenue) + Number(prevStats.revenue)
+        };
+        // Top items come from surviving (unpurged) rows — recent-biased once
+        // purging kicks in; per-item history of purged orders is gone by design.
         const [allItems] = await db.query('SELECT items FROM orders ORDER BY id DESC LIMIT 5000');
         const map = new Map();
         allItems.forEach(row => {
@@ -971,18 +1046,17 @@ app.get('/api/analytics', requireAdmin, async (req, res) => {
         });
         const topItems = [...map.values()].sort((a, b) => b.qty - a.qty).slice(0, 8);
         // Fill calendar days that had no orders so charts stay continuous
-        const byDayMap = new Map(byDay.map(d => [new Date(d.day).toISOString().slice(0, 10), d]));
         const filledDays = [];
         for (let i = days - 1; i >= 0; i--) {
             const dt = new Date();
             dt.setDate(dt.getDate() - i);
             const key = dt.toISOString().slice(0, 10);
-            const row = byDayMap.get(key);
+            const p = placed.get(key) || { orders: 0, revenue: 0 };
             filledDays.push({
                 day: key,
-                orders: row ? Number(row.orders) : 0,
-                revenue: row ? Number(row.revenue) : 0,
-                delivered: row ? Number(row.delivered) : 0
+                orders: p.orders,
+                revenue: Math.round(p.revenue * 100) / 100,
+                delivered: deliveredPerDay.get(key) || 0
             });
         }
         res.json({ success: true, data: { totals, byStatus, byDay: filledDays, prev, days, topItems } });
@@ -1447,6 +1521,47 @@ async function migrateDB() {
             } catch (e) {
                 console.warn('⚠️  orders phone index note:', e.message);
             }
+        },
+        async () => {
+            // 24h delivery grace clock (see PATCH /api/orders/:id/status).
+            const [has] = await db.query("SHOW COLUMNS FROM orders LIKE 'delivered_at'");
+            if (has.length === 0) {
+                await db.query('ALTER TABLE orders ADD COLUMN delivered_at DATETIME DEFAULT NULL AFTER assigned_to');
+                console.log('✅ Added delivered_at column to orders');
+            }
+        },
+        async () => {
+            // Daily aggregates that survive the delivered-order purge
+            // (placed_* by created day, delivered_* by delivery day).
+            await db.query(`CREATE TABLE IF NOT EXISTS delivery_stats (
+                day DATE PRIMARY KEY,
+                placed_count INT NOT NULL DEFAULT 0,
+                placed_revenue DECIMAL(10, 2) NOT NULL DEFAULT 0,
+                delivered_count INT NOT NULL DEFAULT 0,
+                delivered_revenue DECIMAL(10, 2) NOT NULL DEFAULT 0
+            )`);
+        },
+        async () => {
+            // Backfill the grace clock for orders delivered before this
+            // deploy so the purge job can age them (C: purge old delivered).
+            await db.query(
+                `UPDATE orders SET delivered_at = updated_at
+                 WHERE status = 'delivered' AND delivered_at IS NULL`
+            );
+        },
+        async () => {
+            try {
+                const [idx] = await db.query(
+                    `SELECT INDEX_NAME FROM information_schema.STATISTICS
+                     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'orders' AND INDEX_NAME = 'idx_orders_purge'`
+                );
+                if (idx.length === 0) {
+                    await db.query('ALTER TABLE orders ADD INDEX idx_orders_purge (status, delivered_at)');
+                    console.log('✅ Added orders purge index');
+                }
+            } catch (e) {
+                console.warn('⚠️  orders purge index note:', e.message);
+            }
         }
     ];
 
@@ -1488,9 +1603,76 @@ async function bootstrapAdmin() {
     }
 }
 
+// Hourly purge: delivered orders past their 24h grace are aggregated into
+// delivery_stats (per delivery day: count + revenue), then hard-deleted with
+// all customer PII. Bounded batch so one tick can't stall the event loop.
+async function purgeDeliveredOrders() {
+    let conn;
+    try {
+        const [rows] = await db.query(
+            `SELECT id, total, created_at, delivered_at FROM orders
+             WHERE status = 'delivered' AND delivered_at IS NOT NULL
+               AND delivered_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)
+             LIMIT 1000`
+        );
+        if (!rows.length) return;
+        // Aggregate twice: placed totals by CREATED day (keeps the orders
+        // and revenue charts whole) and delivered totals by DELIVERY day.
+        // Keys use toISOString day, matching the analytics merge below.
+        const dayKey = (v) => {
+            const d = v instanceof Date ? v : new Date(v);
+            return d.toISOString().slice(0, 10);
+        };
+        const placed = new Map();
+        const delivered = new Map();
+        for (const r of rows) {
+            const ck = dayKey(r.created_at || r.delivered_at);
+            const p = placed.get(ck) || { count: 0, revenue: 0 };
+            p.count += 1;
+            p.revenue = Math.round((p.revenue + Number(r.total || 0)) * 100) / 100;
+            placed.set(ck, p);
+            const dk = dayKey(r.delivered_at || r.created_at);
+            const e = delivered.get(dk) || { count: 0, revenue: 0 };
+            e.count += 1;
+            e.revenue = Math.round((e.revenue + Number(r.total || 0)) * 100) / 100;
+            delivered.set(dk, e);
+        }
+        conn = await db.getConnection();
+        await conn.beginTransaction();
+        for (const [day, e] of placed) {
+            await conn.query(
+                `INSERT INTO delivery_stats (day, placed_count, placed_revenue)
+                 VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE
+                 placed_count = placed_count + VALUES(placed_count),
+                 placed_revenue = placed_revenue + VALUES(placed_revenue)`,
+                [day, e.count, e.revenue]
+            );
+        }
+        for (const [day, e] of delivered) {
+            await conn.query(
+                `INSERT INTO delivery_stats (day, delivered_count, delivered_revenue)
+                 VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE
+                 delivered_count = delivered_count + VALUES(delivered_count),
+                 delivered_revenue = delivered_revenue + VALUES(delivered_revenue)`,
+                [day, e.count, e.revenue]
+            );
+        }
+        await conn.query('DELETE FROM orders WHERE id IN (?)', [rows.map(r => r.id)]);
+        await conn.commit();
+        console.log(`🧹 Purged ${rows.length} delivered order(s) (${placed.size + delivered.size} day-aggregates)`);
+    } catch (error) {
+        try { if (conn) await conn.rollback(); } catch { /* ignore */ }
+        console.warn('⚠️  Delivered purge failed:', error.message);
+    } finally {
+        try { if (conn) conn.release(); } catch { /* ignore */ }
+    }
+}
+
 async function start() {
     await migrateDB();
     await bootstrapAdmin();
+    await purgeDeliveredOrders(); // C: purge already-delivered rows on boot
+    setInterval(purgeDeliveredOrders, 60 * 60 * 1000); // hourly purge
     app.listen(PORT, () => {
         console.log(`🚀 Server running on http://localhost:${PORT}`);
     });

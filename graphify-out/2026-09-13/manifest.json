@@ -14,7 +14,7 @@
   "ayoub.session.sql": {
     "mtime": 1789179720.8724802,
     "seen": 1789256215.6077533,
-    "ast_hash": "1d2c4076079f541f9b11e1d07ded22fc",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "client/admin.js": {
@@ -24,9 +24,9 @@
     "semantic_hash": "67d8c1dd436c9d8c1c9616cf690df6d1"
   },
   "client/app.js": {
-    "mtime": 1789255078.7612917,
-    "seen": 1789255082.5681844,
-    "ast_hash": "ffab7e57b86155831b467f1249d34424",
+    "mtime": 1789257089.8065484,
+    "seen": 1789257094.2983372,
+    "ast_hash": "434f9124637a437f3d2a7843d84af1d9",
     "semantic_hash": ""
   },
   "client/auth.js": {
@@ -60,16 +60,16 @@
     "semantic_hash": "12b12d86dd8e83e1b075ad57bdf71f42"
   },
   "client/sw.js": {
-    "mtime": 1789255928.0324352,
-    "seen": 1789255932.2913053,
-    "ast_hash": "fedc63b3728bb3c9a633d7652a6a47a1",
+    "mtime": 1789257365.6967926,
+    "seen": 1789257370.417945,
+    "ast_hash": "89c4be16af9b1eca97935d2637dea8b8",
     "semantic_hash": ""
   },
   "client/ui.js": {
-    "mtime": 1789221297.9861188,
-    "seen": 1789225710.423454,
-    "ast_hash": "56735623cb642540f877cebd8d1a8d58",
-    "semantic_hash": "56735623cb642540f877cebd8d1a8d58"
+    "mtime": 1789256951.0015223,
+    "seen": 1789256955.1509552,
+    "ast_hash": "9a47f7a52fbfc8b96da553c64312b1fd",
+    "semantic_hash": ""
   },
   "client/validators.js": {
     "mtime": 1789187717.898463,
@@ -102,9 +102,9 @@
     "semantic_hash": "c7a0f1f91bd0d0fc6505b84ec30fdad6"
   },
   "server/server.js": {
-    "mtime": 1789254881.035899,
-    "seen": 1789254885.0684352,
-    "ast_hash": "2afca2f44a900dd2df390bd51959b734",
+    "mtime": 1789259283.8211856,
+    "seen": 1789259288.6068125,
+    "ast_hash": "3227b00b68acfe676579a56a749225f6",
     "semantic_hash": ""
   },
   "skills-lock.json": {
@@ -132,15 +132,15 @@
     "semantic_hash": "4fab1f9fbb0f2fd26e3a2cf7aa302213"
   },
   "README.md": {
-    "mtime": 1789185222.7890942,
-    "seen": 1789225710.4234679,
-    "ast_hash": "709d27384d4dad163a03b0ab07eb59bf",
-    "semantic_hash": "709d27384d4dad163a03b0ab07eb59bf"
+    "mtime": 1789257381.3265157,
+    "seen": 1789257385.877956,
+    "ast_hash": "b2e944b56fc9fc346e77767286fa366f",
+    "semantic_hash": ""
   },
   "client/index.html": {
-    "mtime": 1789255953.935616,
-    "seen": 1789255957.811453,
-    "ast_hash": "99ed6142930a0a313f0f184c8ece9081",
+    "mtime": 1789257316.9776795,
+    "seen": 1789257321.5980415,
+    "ast_hash": "200fc9e6eec06ce59008ff3524234f62",
     "semantic_hash": ""
   },
   "client/favicon.svg": {
@@ -285,6 +285,18 @@
     "mtime": 1789254958.9152656,
     "seen": 1789254962.9356465,
     "ast_hash": "91e6362cc41ffeead64ae6594380c467",
+    "semantic_hash": ""
+  },
+  "client/admin-app.js": {
+    "mtime": 1789257059.9570942,
+    "seen": 1789257064.7349937,
+    "ast_hash": "f220870b78bf68bc15f5091a261b7cf7",
+    "semantic_hash": ""
+  },
+  "client/admin.html": {
+    "mtime": 1789257123.2612202,
+    "seen": 1789257127.8644605,
+    "ast_hash": "af515b36e062abfabc506d4753e04369",
     "semantic_hash": ""
   }
 }
